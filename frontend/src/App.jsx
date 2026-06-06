@@ -2,36 +2,89 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
+//import PhotoGallery from './components/PhotoGallery'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Track which view is currently active
+  const [view, setView] = useState('home')
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+      {/* Navbar */}
+      <nav className="journalNav">
+        <span className="navBrand" onClick={() => setView('home')} style={{ cursor: 'pointer' }}>
+          Digital Travel Journal
+        </span>
+        <div className="navTabs">
+          <button 
+            className={`navBtn ${view === 'home' ? 'active' : ''}`}
+            onClick={() => setView('home')}
+          >
+            Dashboard
+          </button>
+          <button 
+            className={`navBtn ${view === 'entries' ? 'active' : ''}`}
+            onClick={() => setView('entries')}
+          >
+            Entries
+          </button>
+          <button 
+            className={`navBtn ${view === 'map' ? 'active' : ''}`}
+            onClick={() => setView('map')}
+          >
+            Map Tracker
+          </button>
+          <button 
+            className={`navBtn ${view === 'gallery' ? 'active' : ''}`}
+            onClick={() => setView('gallery')}
+          >
+            Gallery
+          </button>
         </div>
-        <div>
-          <h1>Digital Travel Journal</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      </nav>
+
+      {/* Main Page */}
+      <main className="main-content-wrapper">
+        {view === 'home' && (
+          <section id="center">
+            <div>
+              <h1>Digital Travel Journal</h1>
+            </div>
+          </section>
+        )}
+
+        {view === 'entries' && (
+          <section id="center">
+            <div>
+              <h1>Journal Entries</h1>
+              {/* <JournalEntriesList /> Placeholder for your entries component */}
+            </div>
+          </section>
+        )}
+
+        {view === 'map' && (
+          <section id="center">
+            <div>
+              <h1>Map Tracker</h1>
+              {/* <TravelMap /> Placeholder for your map tracking component */}
+            </div>
+          </section>
+        )}
+
+        {view === 'gallery' && (
+          <section id="center">
+            <div>
+              <h1>Journal Gallery</h1>
+            </div>
+            <PhotoGallery />
+          </section>
+        )}
+      </main>
 
       <div className="ticks"></div>
 
+      {/* Footer System */}
       <section id="next-steps">
         <div id="docs">
           <svg className="icon" role="presentation" aria-hidden="true">
@@ -63,11 +116,7 @@ function App() {
           <ul>
             <li>
               <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
+                <svg className="button-icon" role="presentation" aria-hidden="true">
                   <use href="/icons.svg#github-icon"></use>
                 </svg>
                 GitHub
@@ -75,38 +124,10 @@ function App() {
             </li>
             <li>
               <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
+                <svg className="button-icon" role="presentation" aria-hidden="true">
                   <use href="/icons.svg#discord-icon"></use>
                 </svg>
                 Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
               </a>
             </li>
           </ul>
