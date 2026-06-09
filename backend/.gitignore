@@ -1,0 +1,5 @@
+.venv/
+travel_journal.db
+__pycache__/
+*.pyc
+.env
