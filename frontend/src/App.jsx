@@ -1,143 +1,215 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-//import PhotoGallery from './components/PhotoGallery'
-import './App.css'
+import { useState } from "react";
+import {
+  Map,
+  Images,
+  ListTree,
+  LockKeyhole,
+  CalendarDays,
+  User,
+  MapPin,
+  Calendar,
+  Plane,
+  Car,
+  Train,
+  PersonStanding,
+  Camera,
+  Music,
+  Play,
+  Send
+} from "lucide-react";
+import "./App.css";
 
 function App() {
-  // Track which view is currently active
-  const [view, setView] = useState('home')
+  const [form, setForm] = useState({
+    title: "",
+    location: "",
+    entry_date: "",
+    notes: "",
+    transportation: "Plane"
+  });
+
+  const [message, setMessage] = useState("");
+
+  function handleChange(event) {
+    setForm({
+      ...form,
+      [event.target.name]: event.target.value
+    });
+  }
+
+  function selectTransportation(type) {
+    setForm({
+      ...form,
+      transportation: type
+    });
+  }
+
+  async function saveEntry() {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/journals", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(form)
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save entry");
+      }
+
+      setMessage("Journal entry saved successfully.");
+
+      setForm({
+        title: "",
+        location: "",
+        entry_date: "",
+        notes: "",
+        transportation: "Plane"
+      });
+    } catch (error) {
+      setMessage("Could not save entry. Make sure the backend is running.");
+    }
+  }
 
   return (
-    <>
-      {/* Navbar */}
-      <nav className="journalNav">
-        <span className="navBrand" onClick={() => setView('home')} style={{ cursor: 'pointer' }}>
-          Digital Travel Journal
-        </span>
-        <div className="navTabs">
-          <button 
-            className={`navBtn ${view === 'home' ? 'active' : ''}`}
-            onClick={() => setView('home')}
-          >
-            Dashboard
-          </button>
-          <button 
-            className={`navBtn ${view === 'entries' ? 'active' : ''}`}
-            onClick={() => setView('entries')}
-          >
-            Entries
-          </button>
-          <button 
-            className={`navBtn ${view === 'map' ? 'active' : ''}`}
-            onClick={() => setView('map')}
-          >
-            Map Tracker
-          </button>
-          <button 
-            className={`navBtn ${view === 'gallery' ? 'active' : ''}`}
-            onClick={() => setView('gallery')}
-          >
-            Gallery
-          </button>
+    <div className="journal-page">
+      <aside className="sidebar">
+        <nav className="side-nav">
+          <a><Map size={18} /> Map</a>
+          <a><Images size={18} /> My Memories</a>
+          <a><ListTree size={18} /> Timeline</a>
+          <a><LockKeyhole size={18} /> Capsule</a>
+          <a><CalendarDays size={18} /> Itinerary</a>
+        </nav>
+
+        <div className="profile">
+          <User size={18} />
+          <span>Profile</span>
         </div>
-      </nav>
+      </aside>
 
-      {/* Main Page */}
-      <main className="main-content-wrapper">
-        {view === 'home' && (
-          <section id="center">
-            <div>
-              <h1>Digital Travel Journal</h1>
-            </div>
-          </section>
-        )}
+      <main className="entry-area">
+        <section className="entry-card">
+          <h1>Create a New Journal Entry <span>❤</span></h1>
 
-        {view === 'entries' && (
-          <section id="center">
-            <div>
-              <h1>Journal Entries</h1>
-              {/* <JournalEntriesList /> Placeholder for your entries component */}
-            </div>
-          </section>
-        )}
+          <div className="form-grid">
+            <label>
+              Trip Title
+              <input
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                placeholder="e.g. Exploring Tokyo"
+              />
+            </label>
 
-        {view === 'map' && (
-          <section id="center">
-            <div>
-              <h1>Map Tracker</h1>
-              {/* <TravelMap /> Placeholder for your map tracking component */}
-            </div>
-          </section>
-        )}
+            <label>
+              Location
+              <div className="input-icon">
+                <input
+                  name="location"
+                  value={form.location}
+                  onChange={handleChange}
+                  placeholder="e.g. Tokyo, Japan"
+                />
+                <MapPin size={20} />
+              </div>
+            </label>
 
-        {view === 'gallery' && (
-          <section id="center">
-            <div>
-              <h1>Journal Gallery</h1>
+            <label>
+              Date
+              <div className="input-icon">
+                <input
+                  name="entry_date"
+                  value={form.entry_date}
+                  onChange={handleChange}
+                  type="text"
+                  placeholder="mm/dd/yyyy"
+                />
+                <Calendar size={20} />
+              </div>
+            </label>
+
+            <label>
+              Transportation
+              <div className="transport-row">
+                <button
+                  type="button"
+                  className={`transport ${form.transportation === "Plane" ? "active" : ""}`}
+                  onClick={() => selectTransportation("Plane")}
+                >
+                  <Plane />
+                </button>
+
+                <button
+                  type="button"
+                  className={`transport ${form.transportation === "Car" ? "active" : ""}`}
+                  onClick={() => selectTransportation("Car")}
+                >
+                  <Car />
+                </button>
+
+                <button
+                  type="button"
+                  className={`transport ${form.transportation === "Train" ? "active" : ""}`}
+                  onClick={() => selectTransportation("Train")}
+                >
+                  <Train />
+                </button>
+
+                <button
+                  type="button"
+                  className={`transport ${form.transportation === "Walking" ? "active" : ""}`}
+                  onClick={() => selectTransportation("Walking")}
+                >
+                  <PersonStanding />
+                </button>
+              </div>
+            </label>
+          </div>
+
+          <div className="bottom-row">
+            <div className="photo-box">
+              <Camera />
+              <h3>Add Photos</h3>
+              <p>Upload your photos</p>
             </div>
-            <PhotoGallery />
-          </section>
-        )}
+
+            <div className="music-box">
+              <Music className="music-note" />
+              <div>
+                <h2>Music Memory</h2>
+                <p>Add a song that<br />reminds you of this trip</p>
+                <div className="slider">
+                  <div></div>
+                </div>
+              </div>
+              <button type="button" className="play-btn">
+                <Play />
+              </button>
+            </div>
+          </div>
+
+          <label className="notes-label">
+            Journal Description
+            <textarea
+              name="notes"
+              value={form.notes}
+              onChange={handleChange}
+              placeholder="Write about your trip..."
+            />
+          </label>
+
+          {message && <p className="status-message">{message}</p>}
+
+          <button type="button" className="save-btn" onClick={saveEntry}>
+            Save Entry <Send />
+          </button>
+        </section>
       </main>
-
-      <div className="ticks"></div>
-
-      {/* Footer System */}
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg className="button-icon" role="presentation" aria-hidden="true">
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg className="button-icon" role="presentation" aria-hidden="true">
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
