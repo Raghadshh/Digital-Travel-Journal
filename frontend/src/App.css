@@ -7,12 +7,14 @@ body {
   background: #fbf8f0;
   font-family: "Comic Sans MS", "Trebuchet MS", Arial, sans-serif;
   color: #073c3b;
+  overflow-x: hidden;
 }
 
 .journal-page {
   min-height: 100vh;
   display: flex;
   background: #fbf8f0;
+  width: 100%;
 }
 
 .sidebar {
@@ -50,11 +52,14 @@ body {
 
 .entry-area {
   flex: 1;
-  padding: 48px 0 0 80px;
+  padding: 48px 40px 0;
+  display: flex;
+  justify-content: center;
 }
 
 .entry-card {
-  width: 1040px;
+  width: 100%;
+  max-width: 1040px;
 }
 
 .entry-card h1 {
@@ -65,13 +70,13 @@ body {
 }
 
 .entry-card h1 span {
-  color: #ff684f;
+  color: #b45309;
   font-size: 32px;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: 470px 470px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 58px 70px;
 }
 
@@ -142,14 +147,14 @@ input {
 
 .transport.active {
   background: #fff1df;
-  color: #ff741c;
-  box-shadow: inset 0 0 0 3px #ff741c;
+  color: #9a3412;
+  box-shadow: inset 0 0 0 3px #9a3412;
   border-radius: 17px;
 }
 
 .bottom-row {
   display: grid;
-  grid-template-columns: 390px 630px;
+  grid-template-columns: minmax(0, 390px) minmax(0, 1fr);
   gap: 40px;
   margin-top: 70px;
   align-items: center;
@@ -180,7 +185,7 @@ input {
 
 .photo-box p {
   margin: 0;
-  color: #80766c;
+  color: #665d53;
   font-size: 20px;
   font-weight: 800;
 }
@@ -246,6 +251,8 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
+  justify-self: start;
+  margin-left: -14px;
 }
 
 .play-btn svg {
@@ -257,8 +264,8 @@ input {
 
 .save-btn {
   margin-top: 50px;
-  margin-left: 740px;
-  background: #2fa86f;
+  margin-left: auto;
+  background: #166534;
   color: white;
   border: none;
   border-radius: 18px;
@@ -296,5 +303,5 @@ textarea {
   margin-top: 20px;
   font-size: 18px;
   font-weight: 800;
-  color: #2fa86f;
+  color: #166534;
 }
