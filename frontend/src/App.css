@@ -305,3 +305,260 @@ textarea {
   font-weight: 800;
   color: #166534;
 }
+
+/* photo gallery  styles*/
+
+.side-nav a.active-nav {
+  color: #b45309;
+}
+
+.side-nav a {
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.side-nav a:hover {
+  color: #15758b;
+}
+
+/* Photo Gallery Structural Classes */
+.gallery-wrapper {
+  width: 100%;
+}
+
+.empty-gallery {
+  padding: 60px 20px;
+  text-align: center;
+  border: 2px dashed #e8d9c5;
+  border-radius: 22px;
+  background: #fffdf9;
+  font-size: 20px;
+  color: #665d53;
+  font-weight: 800;
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 28px;
+  width: 100%;
+}
+
+.photo-card {
+  background: #fffdf9;
+  border: 2px solid #efe4d6;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(80, 55, 30, 0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+  height: 170px;
+  background: #e6d9f4;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.delete-overlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(7, 60, 59, 0.85);
+  color: #fffdf9;
+  border: none;
+  border-radius: 50%;
+  
+  /* Strict bounding box dimensions */
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  
+  /* Reset global layout overrides */
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  line-height: 1;
+  z-index: 10;
+}
+
+.delete-overlay:hover {
+  background: #b45309;
+}
+
+.card-details {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.photo-title-input {
+  width: 100%;
+  height: auto;
+  margin-top: 0;
+  padding: 2px 0;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font-size: 18px;
+  font-weight: 900;
+  color: #073c3b;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.photo-title-input:focus {
+  border-bottom: 2px solid #b45309;
+}
+
+.location-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.location-icon {
+  font-size: 15px;
+}
+
+.photo-location-input {
+  width: 100%;
+  height: auto;
+  margin-top: 0;
+  padding: 2px 0;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 800;
+  color: #665d53;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.photo-date {
+  font-size: 13px;
+  color: #a39684;
+  font-weight: 800;
+  text-align: right;
+  margin-top: 6px;
+}
+
+.date-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;        
+  margin-top: 2px;
+}
+
+.date-icon {
+  font-size: 11px;
+}
+
+.photo-date-input {
+  width: 100%;
+  height: auto;
+  margin-top: 0;
+  padding: 0;      
+  border: none;
+  background: transparent;
+  font-size: 12px; 
+  font-weight: 700;
+  color: #b3a694; 
+  box-shadow: none;
+  border-radius: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+
+.photo-date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: opacity(0.5);
+  transform: scale(0.85); 
+}
+
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(7, 60, 59, 0.92); 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 40px;
+  cursor: zoom-out;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.lightbox-content {
+  max-width: 85%;
+  max-height: 85%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: default;
+}
+
+.lightbox-content img {
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.lightbox-caption {
+  margin-top: 16px;
+  color: #fffdf9;
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 24px;
+  right: 24px; 
+  background: transparent;
+  border: none;
+  color: #fffdf9;
+  font-size: 28px;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
