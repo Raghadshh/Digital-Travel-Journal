@@ -562,3 +562,87 @@ textarea {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* Date Input Overlap fix */
+
+.input-icon input[type="date"] {
+  padding-right: 75px !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+.input-icon svg {
+  pointer-events: none;
+}
+
+/* Search & Filtering Feature Styles */
+
+.search-container {
+  display: flex;
+  gap: 16px;
+  background: #fffdf9;
+  border: 2px solid #efe4d6;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 3px 8px rgba(80, 55, 30, 0.06);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input, 
+.search-date-input {
+  flex: 1;
+  min-width: 160px;
+  height: 48px;
+  border: 2px solid #efe4d6;
+  border-radius: 12px;
+  padding: 0 16px;
+  font-size: 16px;
+  font-family: inherit;
+  font-weight: 700;
+  color: #555;
+  background: #ffffff;
+  outline: none;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.search-input:focus, 
+.search-date-input:focus {
+  border-color: #b45309;
+}
+
+.clear-search-btn {
+  height: 48px;
+  padding: 0 24px;
+  background: #b45309;
+  color: #fffdf9;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.clear-search-btn:hover {
+  background: #9a3412;
+}
+
+.clear-search-btn:active {
+  transform: scale(0.98);
+}
+
+.no-results {
+  padding: 50px 20px;
+  text-align: center;
+  border: 2px dashed #eadfce;
+  border-radius: 22px;
+  background: #fbf8f0;
+  font-size: 18px;
+  color: #665d53;
+  font-weight: 800;
+}
