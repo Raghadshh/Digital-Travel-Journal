@@ -137,7 +137,7 @@ function App() {
                     name="entry_date"
                     value={form.entry_date}
                     onChange={handleChange}
-                    type="text"
+                    type="date"
                     placeholder="mm/dd/yyyy"
                   />
                   <Calendar size={20} />
