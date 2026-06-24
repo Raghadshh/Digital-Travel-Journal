@@ -11,6 +11,7 @@ These are the main colors used by the journal page:
 - Sidebar surface: `#fffdf7`
 - Border color: `#eadfce`
 - Main card/input surface: `#fffdf9`
+- Input border: `#efe4d6`
 - Input text: `#555`
 - Neutral icon gray: `#66615d`
 - Transport inactive: `#5c5955`
@@ -24,6 +25,10 @@ These are the main colors used by the journal page:
 - Purple accent: `#6f3bc4`
 - Purple music text: `#30198b`
 - Save button and status text: `#166534`
+- Gallery upload border: `#e8d9c5`
+- Gallery image placeholder background: `#e6d9f4`
+- Delete background: `rgba(7, 60, 59, 0.85)`
+- Delete  text: `#fffdf9`
 
 ## index.css
 

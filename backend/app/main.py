@@ -2,9 +2,9 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from database import engine, Base, get_db
-from models import JournalEntry
-from schemas import JournalCreate
+from .database import engine, Base, get_db
+from .models import JournalEntry
+from .schemas import JournalCreate
 
 Base.metadata.create_all(bind=engine)
 
