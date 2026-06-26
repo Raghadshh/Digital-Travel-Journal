@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Map,
   Images,
@@ -15,18 +15,17 @@ import {
   Camera,
   Music,
   Play,
-  Send
+  Send,
+  LogOut
 } from "lucide-react";
 import PhotoGallery from "./components/PhotoGallery";
-import "./App.css"; // Referencing App.css verbatim
+import "./App.css";
+
+const API_URL = "http://127.0.0.1:8000";
 
 function App() {
-  // Navigation View State
   const [currentView, setCurrentView] = useState("create");
-  
-  // share media state between views
   const [photos, setPhotos] = useState([]);
-
   const [form, setForm] = useState({
     title: "",
     location: "",
@@ -34,12 +33,39 @@ function App() {
     notes: "",
     transportation: "Plane"
   });
-
   const [message, setMessage] = useState("");
+  const [token, setToken] = useState(() => window.localStorage.getItem("travel_journal_token"));
+  const [userEmail, setUserEmail] = useState(() => window.localStorage.getItem("travel_journal_user") || "");
+  const [authMode, setAuthMode] = useState("login");
+  const [authForm, setAuthForm] = useState({ email: "", password: "" });
+  const [authMessage, setAuthMessage] = useState("");
+
+  useEffect(() => {
+    if (token) {
+      window.localStorage.setItem("travel_journal_token", token);
+    } else {
+      window.localStorage.removeItem("travel_journal_token");
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (userEmail) {
+      window.localStorage.setItem("travel_journal_user", userEmail);
+    } else {
+      window.localStorage.removeItem("travel_journal_user");
+    }
+  }, [userEmail]);
 
   function handleChange(event) {
     setForm({
       ...form,
+      [event.target.name]: event.target.value
+    });
+  }
+
+  function handleAuthChange(event) {
+    setAuthForm({
+      ...authForm,
       [event.target.name]: event.target.value
     });
   }
@@ -53,10 +79,11 @@ function App() {
 
   async function saveEntry() {
     try {
-      const response = await fetch("http://127.0.0.1:8000/journals", {
+      const response = await fetch(`${API_URL}/journals`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         body: JSON.stringify(form)
       });
@@ -79,28 +106,141 @@ function App() {
     }
   }
 
+  async function submitAuth(event) {
+    event.preventDefault();
+    setAuthMessage("");
+
+    try {
+      const response = await fetch(`${API_URL}${authMode === "login" ? "/auth/login" : "/auth/register"}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(authForm)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Authentication failed");
+      }
+
+      setToken(data.access_token);
+      setUserEmail(authForm.email.trim().toLowerCase());
+      setAuthMessage(data.message || "Authentication successful");
+      setAuthForm({ email: "", password: "" });
+    } catch (error) {
+      setAuthMessage(error.message);
+    }
+  }
+
+  function logout() {
+    setToken(null);
+    setUserEmail("");
+    setCurrentView("create");
+    setAuthMessage("You have been logged out.");
+  }
+
+  if (!token) {
+    return (
+      <div className="auth-page">
+        <div className="auth-card">
+          <div className="auth-card-header">
+            <h1>Travel Journal</h1>
+            <p>Capture memories, protect your stories, and revisit them anytime.</p>
+          </div>
+
+          <div className="auth-switcher">
+            <button
+              type="button"
+              className={authMode === "login" ? "active" : ""}
+              onClick={() => {
+                setAuthMode("login");
+                setAuthMessage("");
+              }}
+            >
+              Login
+            </button>
+            <button
+              type="button"
+              className={authMode === "register" ? "active" : ""}
+              onClick={() => {
+                setAuthMode("register");
+                setAuthMessage("");
+              }}
+            >
+              Register
+            </button>
+          </div>
+
+          <form className="auth-form" onSubmit={submitAuth}>
+            <label>
+              Email
+              <input
+                type="email"
+                name="email"
+                value={authForm.email}
+                onChange={handleAuthChange}
+                placeholder="you@example.com"
+                required
+              />
+            </label>
+
+            <label>
+              Password
+              <input
+                type="password"
+                name="password"
+                value={authForm.password}
+                onChange={handleAuthChange}
+                placeholder="Use a strong password"
+                required
+              />
+            </label>
+
+            <button type="submit" className="auth-submit">
+              {authMode === "login" ? "Log in" : "Create account"}
+            </button>
+          </form>
+
+          {authMessage && <p className="auth-message">{authMessage}</p>}
+
+          <p className="auth-help">
+            {authMode === "login"
+              ? "Need an account? Switch to register."
+              : "Passwords must be at least 8 characters and include upper, lower, number, and a special character."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="journal-page">
-      {/* Sidebar navigation and profile section */}
       <aside className="sidebar">
         <nav className="side-nav">
           <a href="#create" className={currentView === "create" ? "active-nav" : ""} onClick={() => setCurrentView("create")}>
             <ListTree size={18} /> New Entry
           </a>
           <a href="#memories" className={currentView === "memories" ? "active-nav" : ""} onClick={() => setCurrentView("memories")}>
-            <Images size={18} /> Gallery 
+            <Images size={18} /> Gallery
           </a>
           <a><Map size={18} /> Map</a>
           <a><LockKeyhole size={18} /> Capsule</a>
           <a><CalendarDays size={18} /> Itinerary</a>
         </nav>
 
-      <div className="profile">
-        <User size={18} />
-        <span>Profile</span>
-    </div>
-</aside>
-      {/* main application area */}
+        <div className="sidebar-footer">
+          <div className="profile">
+            <User size={18} />
+            <span>{userEmail || "Profile"}</span>
+          </div>
+          <button type="button" className="logout-btn" onClick={logout}>
+            <LogOut size={16} /> Logout
+          </button>
+        </div>
+      </aside>
+
       <main className="entry-area">
         {currentView === "create" ? (
           <section className="entry-card">
@@ -183,7 +323,6 @@ function App() {
             </div>
 
             <div className="bottom-row">
-              {/* Photo Box upload mechanism */}
               <PhotoGallery photos={photos} setPhotos={setPhotos} Icon={Camera} onlyUploadBox={true} />
 
               <div className="music-box">
@@ -220,7 +359,6 @@ function App() {
         ) : (
           <section className="entry-card">
             <h1>Gallery <span></span></h1>
-            {/* Renders the full grid layout */}
             <PhotoGallery photos={photos} setPhotos={setPhotos} Icon={Camera} onlyUploadBox={false} />
           </section>
         )}
