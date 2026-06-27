@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import PhotoGallery from "./components/PhotoGallery";
 import LandingPage from "./components/LandingPage";
+import Checklist from "./components/Checklist";
 import "./App.css";
 
 const API_URL = "http://127.0.0.1:8000";
@@ -273,6 +274,9 @@ function App() {
           <a href="#memories" className={currentView === "memories" ? "active-nav" : ""} onClick={() => setCurrentView("memories")}>
             <Images size={18} /> Gallery
           </a>
+          <a href="#checklist" className={currentView === "checklist" ? "active-nav" : ""} onClick={() => setCurrentView("checklist")}>
+    <ListTree size={18} /> Checklist
+  </a>
           <a><Map size={18} /> Map</a>
           <a><LockKeyhole size={18} /> Capsule</a>
           <a><CalendarDays size={18} /> Itinerary</a>
@@ -290,10 +294,10 @@ function App() {
       </aside>
 
       <main className="entry-area">
-        {currentView === "create" ? (
+        {currentView === "create" && (
           <section className="entry-card">
             <h1>Create a New Journal Entry <span>❤</span></h1>
-
+  
             <div className="form-grid">
               <label>
                 Trip Title
@@ -404,10 +408,18 @@ function App() {
               Save Entry <Send />
             </button>
           </section>
-        ) : (
+        )}
+
+        {currentView === "memories" && (
           <section className="entry-card">
             <h1>Gallery <span></span></h1>
             <PhotoGallery photos={photos} setPhotos={setPhotos} Icon={Camera} onlyUploadBox={false} />
+          </section>
+        )}
+
+        {currentView === "checklist" && (
+          <section className="entry-card">
+            <Checklist />
           </section>
         )}
       </main>

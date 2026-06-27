@@ -1,0 +1,147 @@
+/* src/styles/Checklist.css */
+
+/* Import font */
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Quicksand:wght@500;700&display=swap');
+
+.checklist-container {
+  max-width: 800px;
+  margin: 1rem auto;
+  padding: 1rem;
+  font-family: 'Quicksand', sans-serif;
+  color: #003e3a; /* Dark teal text color used in your headers */
+}
+
+.checklist-title {
+  font-family: inherit; 
+  font-size: 2rem;
+  font-weight: 700;
+  color: #064e43;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+/* Input Form Matching the Text Fields */
+.checklist-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+
+.checklist-input {
+  flex: 1;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  border: 2px solid #f2e6d9;
+  border-radius: 14px;
+  background-color: #fffdfa;
+  color: #333;
+  outline: none;
+  font-family: 'Quicksand', sans-serif;
+  transition: border-color 0.2s ease;
+}
+
+.checklist-input:focus {
+  border-color: #cbbba0;
+}
+
+/* Button Variants matching the App Vibe */
+.btn-add {
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  background-color: #f6e6dc;
+  color: #8c431d; /* Terracotta tone from your active transportation button */
+  border: 2px solid #8c431d;
+  border-radius: 14px;
+  cursor: pointer;
+  font-family: 'Quicksand', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.btn-add:hover {
+  background-color: #8c431d;
+  color: #fffdfa;
+}
+
+/* Checklist Table UI */
+.checklist-table-wrapper {
+  background-color: #fffdfa;
+  border: 2px solid #f2e6d9;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.checklist-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.checklist-table th {
+  background-color: #f9f5eb;
+  color: #064e43;
+  font-weight: 700;
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 2px solid #f2e6d9;
+}
+
+.checklist-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #f9f5eb;
+  vertical-align: middle;
+}
+
+/* Custom Checkbox Vibe */
+.checkbox-container input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #064e43;
+  cursor: pointer;
+}
+
+/* Row states */
+.row-completed {
+  background-color: #faf8f5;
+}
+
+.text-completed {
+  text-decoration: line-through;
+  color: #a0b0ad;
+}
+
+/* Action Utility Buttons */
+.checklist-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit, .btn-save, .btn-delete {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Quicksand', sans-serif;
+}
+
+.btn-edit {
+  background-color: #e6f2f0;
+  color: #064e43;
+}
+
+.btn-save {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.btn-delete {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
