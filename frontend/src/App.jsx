@@ -16,9 +16,12 @@ import {
   Music,
   Play,
   Send,
-  LogOut
+  LogOut,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import PhotoGallery from "./components/PhotoGallery";
+import LandingPage from "./components/LandingPage";
 import "./App.css";
 
 const API_URL = "http://127.0.0.1:8000";
@@ -26,6 +29,9 @@ const API_URL = "http://127.0.0.1:8000";
 function App() {
   const [currentView, setCurrentView] = useState("create");
   const [photos, setPhotos] = useState([]);
+  const [showLanding, setShowLanding] = useState(true);
+  const [showPasswordLogin, setShowPasswordLogin] = useState(false);
+  const [showPasswordRegister, setShowPasswordRegister] = useState(false);
   const [form, setForm] = useState({
     title: "",
     location: "",
@@ -141,75 +147,117 @@ function App() {
     setAuthMessage("You have been logged out.");
   }
 
+  if (showLanding && !token) {
+    return (
+      <LandingPage
+        onGetStarted={() => {
+          setShowLanding(false);
+          setAuthMode("register");
+        }}
+        onLogIn={() => {
+          setShowLanding(false);
+          setAuthMode("login");
+        }}
+      />
+    );
+  }
+
   if (!token) {
     return (
       <div className="auth-page">
+        {/* Header */}
+        <div className="auth-header">
+          <div className="auth-logo">
+            <img src="/images/mini_plane_landingpg.png" alt="Plane" className="auth-plane" />
+            <span>Digital Travel Journal</span>
+          </div>
+          <button 
+            className="auth-toggle-link"
+            onClick={() => {
+              setAuthMode(authMode === "login" ? "register" : "login");
+              setAuthMessage("");
+            }}
+          >
+            {authMode === "login" 
+              ? "Don't have an account? Sign up" 
+              : "Already have an account? Log in"}
+          </button>
+        </div>
+
+        {/* Auth Card */}
         <div className="auth-card">
           <div className="auth-card-header">
-            <h1>Travel Journal</h1>
-            <p>Capture memories, protect your stories, and revisit them anytime.</p>
-          </div>
-
-          <div className="auth-switcher">
-            <button
-              type="button"
-              className={authMode === "login" ? "active" : ""}
-              onClick={() => {
-                setAuthMode("login");
-                setAuthMessage("");
-              }}
-            >
-              Login
-            </button>
-            <button
-              type="button"
-              className={authMode === "register" ? "active" : ""}
-              onClick={() => {
-                setAuthMode("register");
-                setAuthMessage("");
-              }}
-            >
-              Register
-            </button>
+            <h1>
+              {authMode === "login" ? "Welcome Back! ❤" : "Create Account"}
+            </h1>
+            <p>
+              {authMode === "login" 
+                ? "Log in to continue your journey" 
+                : "Start documenting your adventures"}
+            </p>
           </div>
 
           <form className="auth-form" onSubmit={submitAuth}>
-            <label>
-              Email
+            <div className="form-group">
+              <label>Email</label>
               <input
                 type="email"
                 name="email"
                 value={authForm.email}
                 onChange={handleAuthChange}
-                placeholder="you@example.com"
+                placeholder="example@email.com"
                 required
               />
-            </label>
+            </div>
 
-            <label>
-              Password
-              <input
-                type="password"
-                name="password"
-                value={authForm.password}
-                onChange={handleAuthChange}
-                placeholder="Use a strong password"
-                required
-              />
-            </label>
+            <div className="form-group">
+              <label>Password</label>
+              <div className="password-input-wrapper">
+                <input
+                  type={authMode === "login" ? (showPasswordLogin ? "text" : "password") : (showPasswordRegister ? "text" : "password")}
+                  name="password"
+                  value={authForm.password}
+                  onChange={handleAuthChange}
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => {
+                    if (authMode === "login") {
+                      setShowPasswordLogin(!showPasswordLogin);
+                    } else {
+                      setShowPasswordRegister(!showPasswordRegister);
+                    }
+                  }}
+                >
+                  {authMode === "login" ? (
+                    showPasswordLogin ? <EyeOff size={18} /> : <Eye size={18} />
+                  ) : (
+                    showPasswordRegister ? <EyeOff size={18} /> : <Eye size={18} />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {authMode === "login" && (
+              <a href="#" className="forgot-password">Forgot password?</a>
+            )}
 
             <button type="submit" className="auth-submit">
-              {authMode === "login" ? "Log in" : "Create account"}
+              {authMode === "login" ? "Log In" : "Create Account"}
+              {authMode === "login" && <span className="arrow">→</span>}
             </button>
           </form>
 
           {authMessage && <p className="auth-message">{authMessage}</p>}
 
-          <p className="auth-help">
-            {authMode === "login"
-              ? "Need an account? Switch to register."
-              : "Passwords must be at least 8 characters and include upper, lower, number, and a special character."}
-          </p>
+          {authMode === "register" && (
+            <p className="auth-help">
+              Passwords must be at least 8 characters and include upper, lower, number, and a special character.
+            </p>
+          )}
         </div>
       </div>
     );

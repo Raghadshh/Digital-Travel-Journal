@@ -12,96 +12,204 @@ body {
 
 .auth-page {
   min-height: 100vh;
+  background-image: url("/images/background_loginandlogin.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  position: relative;
+}
+
+.auth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  right: 24px;
+  width: calc(100% - 48px);
+}
+
+.auth-logo {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: linear-gradient(135deg, #fffdf7 0%, #f7efe3 100%);
+  gap: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #183d32;
+}
+
+.auth-plane {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.auth-toggle-link {
+  background: none;
+  border: none;
+  color: #2f9b65;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0;
+}
+
+.auth-toggle-link:hover {
+  text-decoration: underline;
 }
 
 .auth-card {
-  width: min(440px, 100%);
-  background: #fffdf9;
-  border: 2px solid #efe4d6;
-  border-radius: 24px;
-  padding: 32px;
-  box-shadow: 0 16px 40px rgba(80, 55, 30, 0.12);
+  width: min(520px, 100%);
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 16px;
+  padding: 48px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+  margin: auto;
+  align-self: center;
+  margin-top: 60px;
+}
+
+.auth-card-header {
+  text-align: center;
+  margin-bottom: 32px;
 }
 
 .auth-card-header h1 {
-  margin: 0 0 10px;
-  font-size: 34px;
-  color: #073c3b;
+  margin: 0 0 12px;
+  font-size: 32px;
+  color: #183d32;
+  font-weight: 800;
 }
 
 .auth-card-header p {
-  margin: 0 0 24px;
-  font-size: 16px;
+  margin: 0;
+  font-size: 14px;
   line-height: 1.5;
-  color: #665d53;
+  color: #999;
 }
 
-.auth-switcher {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-bottom: 20px;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
 }
 
-.auth-switcher button {
-  border: 1px solid #efe4d6;
-  background: #fbf8f0;
-  border-radius: 999px;
-  padding: 10px 14px;
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #183d32;
+}
+
+.form-group input {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 14px;
   font-family: inherit;
-  font-weight: 800;
-  cursor: pointer;
-  color: #073c3b;
+  color: #333;
+  background: #f9f9f9;
 }
 
-.auth-switcher button.active {
-  background: #b45309;
-  color: white;
-  border-color: #b45309;
+.form-group input:focus {
+  outline: none;
+  border-color: #2f9b65;
+  background: #ffffff;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:hover {
+  color: #333;
+}
+
+.forgot-password {
+  color: #2f9b65;
+  text-decoration: none;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: block;
+  text-align: right;
+  font-weight: 600;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-}
-
-.auth-form label {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 18px;
+  gap: 0;
 }
 
 .auth-submit {
-  margin-top: 8px;
   border: none;
-  border-radius: 14px;
-  background: #166534;
+  border-radius: 8px;
+  background: #2f9b65;
   color: white;
   padding: 14px 18px;
-  font-size: 18px;
-  font-weight: 900;
+  font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+  transition: background 0.3s ease;
+  width: 100%;
+}
+
+.auth-submit:hover {
+  background: #27844f;
+}
+
+.arrow {
+  font-size: 18px;
 }
 
 .auth-message {
   margin-top: 16px;
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 600;
   color: #166534;
+  text-align: center;
 }
 
 .auth-help {
-  margin-top: 14px;
-  color: #665d53;
-  font-size: 14px;
+  margin-top: 20px;
+  color: #999;
+  font-size: 13px;
   line-height: 1.5;
+  text-align: center;
 }
 
 .journal-page {
