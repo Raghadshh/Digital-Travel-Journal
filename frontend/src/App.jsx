@@ -429,12 +429,7 @@ function App() {
             <Checklist />
           </section>
         )}
-        {currentView === "itinerary" && (
-          <section className="entry-card">
-            <Itinerary />
-          </section>
-
-        )}
+        
         {currentView === "itinerary" && (
           <section className="entry-card">
             <Itinerary />
