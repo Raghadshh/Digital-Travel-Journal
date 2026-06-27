@@ -1,3 +1,5 @@
+import base64
+import json
 import hashlib
 import hmac
 import re
@@ -8,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from .database import engine, Base, get_db
 from .models import JournalEntry, User
-from .schemas import AuthResponse, JournalCreate, UserCreate, UserLogin
+from .schemas import AuthResponse, GoogleAuthRequest, JournalCreate, UserCreate, UserLogin
 
 Base.metadata.create_all(bind=engine)
 
@@ -16,7 +18,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -62,6 +64,15 @@ def _create_access_token(email: str) -> str:
     return secrets.token_urlsafe(24) + f"::{email}"
 
 
+def _decode_google_payload(credential: str) -> dict:
+    try:
+        payload = credential.split(".")[1]
+        payload += "=" * (-len(payload) % 4)
+        return json.loads(base64.urlsafe_b64decode(payload.encode("utf-8")))
+    except (IndexError, ValueError, json.JSONDecodeError):
+        raise HTTPException(status_code=400, detail="Invalid Google credential")
+
+
 @app.get("/")
 def home():
     return {"message": "Travel Journal Backend Running"}
@@ -97,6 +108,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     return AuthResponse(
         access_token=_create_access_token(normalized_email),
         message="Registration successful",
+        email=normalized_email,
+        name=user.full_name,
     )
 
 
@@ -114,6 +127,34 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
     return AuthResponse(
         access_token=_create_access_token(normalized_email),
         message="Login successful",
+        email=normalized_email,
+    )
+
+
+@app.post("/auth/google", response_model=AuthResponse)
+def google_auth(request: GoogleAuthRequest, db: Session = Depends(get_db)):
+    payload = _decode_google_payload(request.credential)
+    normalized_email = str(payload.get("email", "")).strip().lower()
+    name = payload.get("name")
+
+    if not normalized_email or not _is_valid_email(normalized_email):
+        raise HTTPException(status_code=400, detail="Google account did not provide a valid email")
+
+    existing_user = db.query(User).filter(User.email == normalized_email).first()
+    if existing_user is None:
+        existing_user = User(
+            email=normalized_email,
+            password_hash="google-auth:" + secrets.token_urlsafe(24),
+        )
+        db.add(existing_user)
+        db.commit()
+        db.refresh(existing_user)
+
+    return AuthResponse(
+        access_token=_create_access_token(normalized_email),
+        message="Google login successful",
+        email=normalized_email,
+        name=name,
     )
 
 
