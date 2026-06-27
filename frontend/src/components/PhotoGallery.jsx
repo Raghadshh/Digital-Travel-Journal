@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 
-export default function PhotoGallery({ photos, setPhotos, Icon }) {
+export default function PhotoGallery({ photos, setPhotos, Icon, iconSrc }) {
   const [error, setError] = useState("");
 
   function handlePhotoUpload(event) {
@@ -39,6 +39,7 @@ export default function PhotoGallery({ photos, setPhotos, Icon }) {
   return (
     <div className="upload-zone">
       <label htmlFor="photo-upload" className="photo-box">
+        {iconSrc && <img src={iconSrc} alt="" className="photo-upload-icon" />}
         {Icon && <Icon />}
         <h3>Add Photos</h3>
         <p>Upload your photos</p>

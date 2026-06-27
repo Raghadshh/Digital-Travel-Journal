@@ -146,22 +146,11 @@
 }
 
 .feature-icon {
-  width: 70px;
-  height: 70px;
+  width: 42px;
+  height: 42px;
   flex-shrink: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  filter: none;
-  display: grid;
-  place-items: center;
-  color: #15916d;
-}
-
-.feature-icon svg {
-  width: 28px;
-  height: 28px;
-  stroke-width: 2.5;
+  object-fit: contain;
+  display: block;
 }
 
 .feature-content {

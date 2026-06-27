@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
-  Calendar,
   CalendarDays,
   Camera,
   Car,
@@ -18,11 +17,13 @@ import {
   Map,
   MapPin,
   Music,
+  Pencil,
   Send,
   PersonStanding,
   Plane,
   Play,
   Search,
+  Trash2,
   Train,
   User
 } from "lucide-react";
@@ -54,6 +55,50 @@ const locationSuggestions = [
   "Rome, Italy"
 ];
 
+function entriesStorageKey(email) {
+  return `travel_journal_entries:${email.trim().toLowerCase()}`;
+}
+
+function profileNameKey(email) {
+  return `travel_journal_name:${email.trim().toLowerCase()}`;
+}
+
+function getStoredProfileName(email) {
+  return email ? window.localStorage.getItem(profileNameKey(email)) : "";
+}
+
+function rememberProfileName(email, name) {
+  if (email && name) {
+    window.localStorage.setItem(profileNameKey(email), name);
+  }
+}
+
+function getStoredEntries(email) {
+  if (!email) {
+    return [];
+  }
+
+  const saved = window.localStorage.getItem(entriesStorageKey(email));
+  return saved ? JSON.parse(saved) : [];
+}
+
+function simplifyPlace(place) {
+  const address = place.address || {};
+  const parts = [
+    place.name,
+    address.city || address.town || address.village || address.municipality || address.county,
+    address.state,
+    address.country
+  ].filter(Boolean);
+
+  const uniqueParts = [...new Set(parts)];
+  if (uniqueParts.length > 0) {
+    return uniqueParts.join(", ");
+  }
+
+  return (place.display_name || "").split(",").slice(0, 3).map((part) => part.trim()).join(", ");
+}
+
 function GoogleIcon() {
   return (
     <svg className="google-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -72,13 +117,16 @@ function App() {
   const [showPasswordRegister, setShowPasswordRegister] = useState(false);
   const [form, setForm] = useState(emptyEntry);
   const [entries, setEntries] = useState(() => {
-    const saved = window.localStorage.getItem("travel_journal_entries");
-    return saved ? JSON.parse(saved) : [];
+    const email = window.localStorage.getItem("travel_journal_user") || "";
+    return getStoredEntries(email);
   });
   const [message, setMessage] = useState("");
   const [token, setToken] = useState(() => window.localStorage.getItem("travel_journal_token"));
   const [userEmail, setUserEmail] = useState(() => window.localStorage.getItem("travel_journal_user") || "");
-  const [userName, setUserName] = useState(() => window.localStorage.getItem("travel_journal_name") || "");
+  const [userName, setUserName] = useState(() => {
+    const email = window.localStorage.getItem("travel_journal_user") || "";
+    return getStoredProfileName(email) || window.localStorage.getItem("travel_journal_name") || "";
+  });
   const [profilePicture, setProfilePicture] = useState(() => window.localStorage.getItem("travel_journal_pfp") || "");
   const [profileForm, setProfileForm] = useState({
     name: window.localStorage.getItem("travel_journal_name") || ""
@@ -109,10 +157,13 @@ function App() {
   }, [userEmail]);
 
   useEffect(() => {
-    userName
-      ? window.localStorage.setItem("travel_journal_name", userName)
-      : window.localStorage.removeItem("travel_journal_name");
-  }, [userName]);
+    if (userName) {
+      window.localStorage.setItem("travel_journal_name", userName);
+      rememberProfileName(userEmail, userName);
+    } else {
+      window.localStorage.removeItem("travel_journal_name");
+    }
+  }, [userEmail, userName]);
 
   useEffect(() => {
     profilePicture
@@ -121,13 +172,23 @@ function App() {
   }, [profilePicture]);
 
   useEffect(() => {
-    window.localStorage.setItem("travel_journal_entries", JSON.stringify(entries));
-  }, [entries]);
+    if (userEmail) {
+      window.localStorage.setItem(entriesStorageKey(userEmail), JSON.stringify(entries));
+    }
+  }, [entries, userEmail]);
 
   useEffect(() => {
     async function fetchEntries() {
+      if (!token) {
+        return;
+      }
+
       try {
-        const response = await fetch(`${API_URL}/journals`);
+        const response = await fetch(`${API_URL}/journals`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         if (response.ok) {
           const data = await response.json();
           setEntries(data);
@@ -137,7 +198,7 @@ function App() {
       }
     }
     fetchEntries();
-  }, [token]);
+  }, [token, userEmail]);
 
   useEffect(() => {
     const query = form.location.trim();
@@ -148,25 +209,28 @@ function App() {
     }
 
     const timeoutId = window.setTimeout(async () => {
+      const fallbackOptions = locationSuggestions.filter((location) =>
+        location.toLowerCase().includes(query.toLowerCase())
+      );
+
       try {
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&q=${encodeURIComponent(query)}`
+          `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=5&q=${encodeURIComponent(query)}`
         );
         const data = await response.json();
         if (!ignore) {
-          setLocationOptions(data.map((place) => place.display_name).filter(Boolean));
-          setShowLocationOptions(true);
+          const apiOptions = data.map(simplifyPlace).filter(Boolean);
+          const nextOptions = [...new Set([...fallbackOptions, ...apiOptions])].slice(0, 6);
+          setLocationOptions(nextOptions);
+          setShowLocationOptions(nextOptions.length > 0);
         }
       } catch {
         if (!ignore) {
-          const fallbackOptions = locationSuggestions.filter((location) =>
-            location.toLowerCase().includes(query.toLowerCase())
-          );
           setLocationOptions(fallbackOptions);
           setShowLocationOptions(fallbackOptions.length > 0);
         }
       }
-    }, 300);
+    }, 160);
 
     return () => {
       ignore = true;
@@ -180,6 +244,7 @@ function App() {
 
     return entries
       .filter((entry) => entry.photos?.length)
+      .filter((entry) => !entry.user_email || entry.user_email === userEmail)
       .filter((entry) => {
         const entryStart = entry.start_date || entry.entry_date || "";
         const matchesKeyword =
@@ -193,7 +258,7 @@ function App() {
 
         return matchesKeyword && matchesLocation && matchesStart && matchesEnd;
       });
-  }, [entries, memoryFilters, memorySearch]);
+  }, [entries, memoryFilters, memorySearch, userEmail]);
 
   function handleChange(event) {
     setForm({
@@ -267,12 +332,37 @@ function App() {
     event.target.value = "";
   }
 
-  function saveProfile(event) {
+  async function saveProfile(event) {
     event.preventDefault();
     const nextName = profileForm.name.trim();
-    setUserName(nextName || userEmail.split("@")[0] || "Traveler");
-    setProfileForm({ name: nextName || userEmail.split("@")[0] || "Traveler" });
-    setProfileMessage("Profile updated.");
+    const nextDisplayName = nextName || userEmail.split("@")[0] || "Traveler";
+
+    try {
+      const response = await fetch(`${API_URL}/users/me`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ full_name: nextDisplayName })
+      });
+
+      if (!response.ok) {
+        throw new Error("Profile saved locally. Start the backend to sync it.");
+      }
+
+      const data = await response.json();
+      const savedName = data.name || nextDisplayName;
+      setUserName(savedName);
+      setProfileForm({ name: savedName });
+      rememberProfileName(userEmail, savedName);
+      setProfileMessage("Profile updated.");
+    } catch (error) {
+      setUserName(nextDisplayName);
+      setProfileForm({ name: nextDisplayName });
+      rememberProfileName(userEmail, nextDisplayName);
+      setProfileMessage(error.message || "Profile saved locally.");
+    }
   }
 
   function openProfile() {
@@ -379,6 +469,7 @@ function App() {
         if (formData.has("files")) {
           const photoResponse = await fetch(`${API_URL}/journals/${savedEntry.id}/photos`, {
             method: "POST",
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
             body: formData
           });
 
@@ -388,7 +479,9 @@ function App() {
         }
       }
 
-      const refreshResponse = await fetch(`${API_URL}/journals`);
+      const refreshResponse = await fetch(`${API_URL}/journals`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
       if (refreshResponse.ok) {
         const structuralData = await refreshResponse.json();
         setEntries(structuralData);
@@ -396,6 +489,7 @@ function App() {
         const nextEntry = {
           ...form,
           id: savedEntry.id,
+          user_email: userEmail,
           createdAt: new Date().toISOString()
         };
         setEntries((current) => [nextEntry, ...current]);
@@ -411,6 +505,7 @@ function App() {
       const nextEntry = {
         ...form,
         id: crypto.randomUUID(),
+        user_email: userEmail,
         createdAt: new Date().toISOString()
       };
       setEntries((current) => [nextEntry, ...current]);
@@ -445,9 +540,14 @@ function App() {
         throw new Error(data.detail || "Authentication failed");
       }
 
+      const normalizedEmail = data.email || authForm.email.trim().toLowerCase();
+      const fallbackName = data.name || authForm.full_name || normalizedEmail.split("@")[0];
+      const savedName = getStoredProfileName(normalizedEmail);
+
       setToken(data.access_token);
-      setUserEmail(data.email || authForm.email.trim().toLowerCase());
-      setUserName(data.name || authForm.full_name || authForm.email.split("@")[0]);
+      setUserEmail(normalizedEmail);
+      setUserName(savedName || fallbackName);
+      setEntries(getStoredEntries(normalizedEmail));
       setAuthMessage(data.message || "Authentication successful");
       setAuthForm({ full_name: "", email: "", password: "" });
       setCurrentView("memories");
@@ -480,9 +580,12 @@ function App() {
             throw new Error(data.detail || "Google authentication failed");
           }
 
+          const savedName = getStoredProfileName(data.email);
+
           setToken(data.access_token);
           setUserEmail(data.email);
-          setUserName(data.name || data.email.split("@")[0]);
+          setUserName(savedName || data.name || data.email.split("@")[0]);
+          setEntries(getStoredEntries(data.email));
           setCurrentView("memories");
         } catch (error) {
           setAuthMessage(error.message);
@@ -496,6 +599,7 @@ function App() {
     setToken(null);
     setUserEmail("");
     setUserName("");
+    setEntries([]);
     setCurrentView("memories");
     setShowLanding(true);
     setAuthMessage("You have been logged out.");
@@ -656,7 +760,9 @@ function App() {
             </div>
             <div>
               <strong>{userName || "Traveler"}</strong>
-              <span>Edit profile</span>
+              <span className="profile-edit-icon" aria-label="Edit profile">
+                <Pencil size={12} />
+              </span>
             </div>
           </button>
           <button type="button" className="logout-btn" onClick={logout}>
@@ -675,14 +781,14 @@ function App() {
                 <div className="profile-photo-preview">
                   {profilePicture ? <img src={profilePicture} alt="Profile preview" /> : <User size={44} />}
                 </div>
-                <div>
+                <div className="profile-photo-actions">
                   <label htmlFor="profile-picture" className="profile-picture-btn">
                     <Camera size={18} /> Change Photo
                   </label>
                   <input id="profile-picture" type="file" accept="image/*" onChange={handleProfilePictureChange} hidden />
                   {profilePicture && (
                     <button type="button" className="remove-photo-btn" onClick={() => setProfilePicture("")}>
-                      Remove Photo
+                      <Trash2 size={18} /> Remove Photo
                     </button>
                   )}
                 </div>
@@ -723,6 +829,7 @@ function App() {
                     onChange={handleLocationChange}
                     onBlur={() => window.setTimeout(() => setShowLocationOptions(false), 150)}
                     onFocus={() => setShowLocationOptions(locationOptions.length > 0)}
+                    autoComplete="off"
                     placeholder="e.g. Tokyo, Japan"
                   />
                   <MapPin size={20} />
@@ -751,7 +858,7 @@ function App() {
                       aria-label="Start date"
                     />
                     <button type="button" className="date-picker-btn" onClick={() => openDatePicker(startDateRef)} aria-label="Open start date calendar">
-                      <Calendar size={18} />
+                      <span className="calendar-mark" aria-hidden="true" />
                     </button>
                   </div>
                   <span>to</span>
@@ -765,7 +872,7 @@ function App() {
                       aria-label="End date"
                     />
                     <button type="button" className="date-picker-btn" onClick={() => openDatePicker(endDateRef)} aria-label="Open end date calendar">
-                      <Calendar size={18} />
+                      <span className="calendar-mark" aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -796,7 +903,7 @@ function App() {
             </div>
 
             <div className="bottom-row">
-              <PhotoGallery photos={form.photos} setPhotos={setEntryPhotos} Icon={Camera} />
+              <PhotoGallery photos={form.photos} setPhotos={setEntryPhotos} iconSrc="/images/mini_camera_newentry.png" />
 
               <div className="music-box">
                 <div className="music-icon-wrap">
@@ -807,6 +914,10 @@ function App() {
                   <p>Add a song that reminds you of this trip</p>
                   <div className="slider">
                     <div></div>
+                  </div>
+                  <div className="music-times">
+                    <span>0:42</span>
+                    <span>2:18</span>
                   </div>
                 </div>
                 <button type="button" className="play-btn" aria-label="Play music memory">
