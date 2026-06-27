@@ -4,17 +4,24 @@ import hashlib
 import hmac
 import re
 import secrets
-from fastapi import FastAPI, Depends, HTTPException
+import os
+import shutil
+from fastapi import FastAPI, Depends, HTTPException, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from .database import engine, Base, get_db
-from .models import JournalEntry, User
-from .schemas import AuthResponse, GoogleAuthRequest, JournalCreate, UserCreate, UserLogin
-
+from .models import JournalEntry, User, JournalPhoto
+from .schemas import AuthResponse, GoogleAuthRequest, JournalCreate, JournalResponse, UserCreate, UserLogin
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+UPLOAD_DIR = "static/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -81,6 +88,10 @@ def home():
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+@app.get("/journals", response_model=list[JournalResponse])
+def get_journals(db: Session = Depends(get_db)):
+    return db.query(JournalEntry).order_by(JournalEntry.entry_date.desc()).all()
 
 
 @app.post("/auth/register", response_model=AuthResponse)
@@ -163,7 +174,7 @@ def logout_user():
     return {"message": "Logout successful"}
 
 
-@app.post("/journals")
+@app.post("/journals", response_model=JournalResponse)
 def create_journal(journal: JournalCreate, db: Session = Depends(get_db)):
     new_entry = JournalEntry(
         title=journal.title,
@@ -177,6 +188,28 @@ def create_journal(journal: JournalCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_entry)
     return new_entry
+
+
+@app.post("/journals/{journal_id}/photos")
+def upload_journal_photos(journal_id: int, files: list[UploadFile] = File(...), db: Session = Depends(get_db)):
+    entry = db.query(JournalEntry).filter(JournalEntry.id == journal_id).first()
+    if not entry:
+        raise HTTPException(status_code=404, detail="Journal entry not found")
+
+    for file in files:
+        file_extension = os.path.splitext(file.filename)[1]
+        unique_filename = f"{secrets.token_hex(8)}{file_extension}"
+        file_path = os.path.join(UPLOAD_DIR, unique_filename)
+
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        photo_url = f"http://127.0.0.1:8000/static/uploads/{unique_filename}"
+        db_photo = JournalPhoto(url=photo_url, journal_id=journal_id)
+        db.add(db_photo)
+
+    db.commit()
+    return {"message": "Photos successfully saved"}
 
 
 @app.put("/journals/{journal_id}")

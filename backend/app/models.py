@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Text, Date
+from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey
+from sqlalchemy.orm import relationship
 from .database import Base
 
 
@@ -24,3 +25,14 @@ class JournalEntry(Base):
     notes = Column(Text)
 
     transportation = Column(String(50))
+
+    photos = relationship("JournalPhoto", back_populates="journal_entry", cascade="all, delete-orphan")
+
+class JournalPhoto(Base):
+    __tablename__ = "journal_photos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    url = Column(String(255), nullable=False)
+    journal_id = Column(Integer, ForeignKey("journal_entries.id", ondelete="CASCADE"), nullable=False)
+
+    journal_entry = relationship("JournalEntry", back_populates="photos")

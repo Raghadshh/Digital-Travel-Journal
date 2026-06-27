@@ -2,6 +2,14 @@ from datetime import date
 from pydantic import BaseModel
 
 
+class PhotoResponse(BaseModel):
+    id: int
+    url: str
+    journal_id: int
+
+    class Config:
+        from_attributes = True
+
 class JournalCreate(BaseModel):
     title: str
     location: str
@@ -9,6 +17,19 @@ class JournalCreate(BaseModel):
 
     notes: str | None = None
     transportation: str | None = None
+
+
+class JournalResponse(BaseModel):
+    id: int
+    title: str
+    location: str
+    entry_date: date
+    notes: str | None = None
+    transportation: str | None = None
+    photos: list[PhotoResponse] = []
+
+    class Config:
+        from_attributes = True
 
 
 class UserCreate(BaseModel):
