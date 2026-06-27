@@ -1,0 +1,111 @@
+/* src/styles/TimelineView.css */
+.timeline-view-container {
+  max-width: 800px;
+  margin: 1rem auto;
+  padding: 1rem;
+  font-family: 'Quicksand', sans-serif;
+  color: #003e3a;
+}
+
+.timeline-view-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #064e43;
+  margin-bottom: 0.2rem;
+}
+
+.timeline-view-subtitle {
+  color: #a0b0ad;
+  margin-bottom: 2.5rem;
+  font-size: 1rem;
+}
+
+.storyline-wrapper {
+  position: relative;
+  padding-left: 25px;
+}
+
+.empty-timeline-state {
+  color: #a0b0ad;
+  text-align: center;
+  padding: 3rem 0;
+  font-style: italic;
+}
+
+/* The physical vertical timeline track line */
+.storyline {
+  position: relative;
+  border-left: 3px dashed #cbbba0; /* Pretty warm dashed line look */
+}
+
+.storyline-item {
+  position: relative;
+  margin-bottom: 2.5rem;
+  padding-left: 30px;
+}
+
+/* The circle badge that holds the transport icon */
+.storyline-badge {
+  position: absolute;
+  left: -17px;
+  top: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #f6e6dc;
+  color: #8c431d;
+  border: 2px solid #8c431d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* Entry Box Cards */
+.storyline-card {
+  background-color: #fffdfa;
+  border: 2px solid #f2e6d9;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+}
+
+.storyline-card-header {
+  display: flex;
+  gap: 15px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #8c431d;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.storyline-date, .storyline-location {
+  display: flex;
+  align-items: center;
+}
+
+.storyline-entry-title {
+  margin: 0 0 0.8rem 0;
+  font-size: 1.3rem;
+  color: #064e43;
+}
+
+.storyline-notes {
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  color: #4a5554;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.storyline-footer {
+  border-top: 1px dashed #f2e6d9;
+  padding-top: 0.6rem;
+}
+
+.transport-badge-label {
+  font-size: 0.8rem;
+  color: #a0b0ad;
+  font-weight: 500;
+}

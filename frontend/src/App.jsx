@@ -24,6 +24,7 @@ import PhotoGallery from "./components/PhotoGallery";
 import LandingPage from "./components/LandingPage";
 import Checklist from "./components/Checklist";
 import Itinerary from "./components/Itinerary";
+import TimelineView from "./components/TimelineView";
 import "./App.css";
 
 const API_URL = "http://127.0.0.1:8000";
@@ -278,7 +279,10 @@ function App() {
           <a href="#checklist" className={currentView === "checklist" ? "active-nav" : ""} onClick={() => setCurrentView("checklist")}>
     <ListTree size={18} /> Checklist
   </a>
-          <a><Map size={18} /> Map</a>
+  <a><Map size={18} /> Map</a>
+  <a href="#timeline" className={currentView === "timeline" ? "active-nav" : ""} onClick={() => setCurrentView("timeline")}>
+  <Map size={18} /> Timeline
+</a>
           <a><LockKeyhole size={18} /> Capsule</a>
           <a href="#itinerary" className={currentView === "itinerary" ? "active-nav" : ""} onClick={() => setCurrentView("itinerary")}>
   <CalendarDays size={18} /> Itinerary
@@ -428,6 +432,17 @@ function App() {
         {currentView === "itinerary" && (
           <section className="entry-card">
             <Itinerary />
+          </section>
+
+        )}
+        {currentView === "itinerary" && (
+          <section className="entry-card">
+            <Itinerary />
+          </section>
+        )}
+        {currentView === "timeline" && (
+          <section className="entry-card">
+            <TimelineView entries={[]} />
           </section>
         )}
       </main>
