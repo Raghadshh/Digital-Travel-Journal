@@ -125,6 +125,21 @@ function App() {
   }, [entries]);
 
   useEffect(() => {
+    async function fetchEntries() {
+      try {
+        const response = await fetch(`${API_URL}/journals`);
+        if (response.ok) {
+          const data = await response.json();
+          setEntries(data);
+        }
+      } catch (error) {
+        console.error("Failed to load records from backend server:", error);
+      }
+    }
+    fetchEntries();
+  }, [token]);
+
+  useEffect(() => {
     const query = form.location.trim();
     let ignore = false;
 
@@ -327,18 +342,72 @@ function App() {
         })
       });
 
-      const savedEntry = response.ok ? await response.json() : {};
-      const nextEntry = {
-        ...form,
-        id: savedEntry.id || crypto.randomUUID(),
-        createdAt: new Date().toISOString()
-      };
+      if (!response.ok) {
+        throw new Error("Failed to create textual entry profile.");
+      }
 
-      setEntries((current) => [nextEntry, ...current]);
+      const savedEntry = await response.json();
+
+      if (form.photos && form.photos.length > 0) {
+        const formData = new FormData();
+        
+        form.photos.forEach((photo, index) => {
+          const dataUrl = typeof photo === "string" ? photo : photo.url;
+          
+          if (dataUrl && dataUrl.startsWith("data:")) {
+            const arr = dataUrl.split(',');
+            const mime = arr[0].match(/:(.*?);/)[1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            
+            while (n--) {
+              u8arr[n] = bstr.charCodeAt(n);
+            }
+            
+            const extension = mime.split('/')[1] || 'jpg';
+            const file = new File([u8arr], `photo_${index}.${extension}`, { type: mime });
+            formData.append("files", file);
+          } else {
+            const targetBlob = photo.file || photo;
+            if (targetBlob instanceof File) {
+              formData.append("files", targetBlob);
+            }
+          }
+        });
+
+        if (formData.has("files")) {
+          const photoResponse = await fetch(`${API_URL}/journals/${savedEntry.id}/photos`, {
+            method: "POST",
+            body: formData
+          });
+
+          if (!photoResponse.ok) {
+            console.error("Database accepted entry text, but storage upload failed.");
+          }
+        }
+      }
+
+      const refreshResponse = await fetch(`${API_URL}/journals`);
+      if (refreshResponse.ok) {
+        const structuralData = await refreshResponse.json();
+        setEntries(structuralData);
+      } else {
+        const nextEntry = {
+          ...form,
+          id: savedEntry.id,
+          createdAt: new Date().toISOString()
+        };
+        setEntries((current) => [nextEntry, ...current]);
+      }
+
       setMessage("Journal entry saved successfully.");
       setForm(emptyEntry);
       setCurrentView("memories");
-    } catch {
+
+    } catch (error) {
+      console.error("Backend offline fallback redirection triggered:", error);
+      
       const nextEntry = {
         ...form,
         id: crypto.randomUUID(),
