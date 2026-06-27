@@ -1,11 +1,10 @@
 import "../styles/LandingPage.css";
-import { CalendarCheck, Images, MapPin, Sparkles } from "lucide-react";
 
 const features = [
-  { Icon: MapPin, title: "Map Your Travels", text: "Pin every place you've been" },
-  { Icon: Images, title: "Save Memories", text: "Photos, notes & more" },
-  { Icon: Sparkles, title: "Relive Moments", text: "Timelines & capsules" },
-  { Icon: CalendarCheck, title: "Plan Ahead", text: "Checklists & itineraries" }
+  { image: "/images/map_your_travelsicon.png", title: "Map Your Travels", text: "Pin every place you've been" },
+  { image: "/images/save_memoriesicon.png", title: "Save Memories", text: "Photos, notes & more" },
+  { image: "/images/Relive_moments.png", title: "Relive Moments", text: "Timelines & capsules" },
+  { image: "/images/planaheadico.png", title: "Plan Ahead", text: "Checklists & itineraries" }
 ];
 
 export default function LandingPage({ onGetStarted, onLogIn }) {
@@ -36,11 +35,9 @@ export default function LandingPage({ onGetStarted, onLogIn }) {
         </div>
 
         <div className="features-grid">
-          {features.map(({ Icon, title, text }) => (
+          {features.map(({ image, title, text }) => (
             <div className="feature-card" key={title}>
-              <div className="feature-icon">
-                <Icon />
-              </div>
+              <img className="feature-icon" src={image} alt="" />
               <div className="feature-content">
                 <h3>{title}</h3>
                 <p>{text}</p>

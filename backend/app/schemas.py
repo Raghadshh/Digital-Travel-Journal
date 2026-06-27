@@ -26,6 +26,7 @@ class JournalResponse(BaseModel):
     entry_date: date
     notes: str | None = None
     transportation: str | None = None
+    user_id: int | None = None
     photos: list[PhotoResponse] = []
 
     class Config:
@@ -41,6 +42,10 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
     email: str
     password: str
+
+
+class UserUpdate(BaseModel):
+    full_name: str | None = None
 
 
 class GoogleAuthRequest(BaseModel):
