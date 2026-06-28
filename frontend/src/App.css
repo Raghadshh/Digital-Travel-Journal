@@ -2119,6 +2119,27 @@ select {
   font-weight: 800;
 }
 
+.memory-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.delete-trip-btn {
+  min-height: 40px;
+  border: 1px solid #f1c7c7;
+  border-radius: 10px;
+  background: #fff5f5;
+  color: #b42318;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
 @media (max-width: 640px) {
   .memory-modal {
     padding: 14px;

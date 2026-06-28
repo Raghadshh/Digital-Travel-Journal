@@ -518,6 +518,29 @@ function App() {
     }
   }
 
+  async function deleteEntry(entry) {
+    if (!entry?.id || !window.confirm(`Delete "${entry.title || "this trip"}"? This cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/journals/${entry.id}`, {
+        method: "DELETE",
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
+
+      if (!response.ok) {
+        throw new Error("Backend delete failed.");
+      }
+    } catch (error) {
+      console.error("Backend delete failed, removing local entry only:", error);
+    }
+
+    setEntries((current) => current.filter((currentEntry) => currentEntry.id !== entry.id));
+    setSelectedMemory(null);
+    setMessage("Trip deleted.");
+  }
+
   async function submitAuth(event) {
     event.preventDefault();
     setAuthMessage("");
@@ -1061,6 +1084,11 @@ function App() {
                     </div>
                   </dl>
                   {selectedMemory.notes && <p className="memory-description">{selectedMemory.notes}</p>}
+                  <div className="memory-modal-actions">
+                    <button type="button" className="delete-trip-btn" onClick={() => deleteEntry(selectedMemory)}>
+                      <Trash2 size={16} /> Delete Trip
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
