@@ -1,147 +1,130 @@
-/* src/styles/Checklist.css */
-
-/* Import font */
-@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Quicksand:wght@500;700&display=swap');
-
-.checklist-container {
-  max-width: 800px;
-  margin: 1rem auto;
-  padding: 1rem;
-  font-family: 'Quicksand', sans-serif;
-  color: #003e3a; /* Dark teal text color used in your headers */
+.checklist-panel {
+  min-width: 0;
 }
 
-.checklist-title {
-  font-family: inherit; 
-  font-size: 2rem;
-  font-weight: 700;
-  color: #064e43;
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-}
-
-/* Input Form Matching the Text Fields */
-.checklist-form {
+.feature-panel-header {
   display: flex;
-  gap: 12px;
-  margin-bottom: 2rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
-.checklist-input {
-  flex: 1;
-  padding: 0.8rem 1.2rem;
-  font-size: 1rem;
-  border: 2px solid #f2e6d9;
-  border-radius: 14px;
-  background-color: #fffdfa;
-  color: #333;
-  outline: none;
-  font-family: 'Quicksand', sans-serif;
-  transition: border-color 0.2s ease;
+.feature-panel-header h2 {
+  margin: 0;
+  color: #073c3b;
+  font-size: 24px;
+  font-weight: 900;
 }
 
-.checklist-input:focus {
-  border-color: #cbbba0;
+.feature-panel-header span {
+  color: #f47b38;
+  font-size: 13px;
+  font-weight: 900;
 }
 
-/* Button Variants matching the App Vibe */
-.btn-add {
-  padding: 0.8rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 700;
-  background-color: #f6e6dc;
-  color: #8c431d; /* Terracotta tone from your active transportation button */
-  border: 2px solid #8c431d;
-  border-radius: 14px;
+.checklist-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.checklist-form input,
+.inline-edit-input {
+  height: 44px;
+  margin: 0;
+  border: 1px solid #eadfce;
+  border-radius: 10px;
+  background: #fffdf9;
+  box-shadow: none;
+  font-size: 14px;
+}
+
+.checklist-form button,
+.table-actions button {
+  min-width: 36px;
+  min-height: 36px;
+  border: none;
+  border-radius: 9px;
+  background: #fff1df;
+  color: #f47b38;
+  display: inline-grid;
+  place-items: center;
+  font-family: inherit;
+  font-weight: 900;
   cursor: pointer;
-  font-family: 'Quicksand', sans-serif;
-  transition: all 0.2s ease;
 }
 
-.btn-add:hover {
-  background-color: #8c431d;
-  color: #fffdfa;
+.feature-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #eadfce;
+  border-radius: 12px;
+  background: #fffdf9;
 }
 
-/* Checklist Table UI */
-.checklist-table-wrapper {
-  background-color: #fffdfa;
-  border: 2px solid #f2e6d9;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-}
-
-.checklist-table {
+.feature-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 460px;
 }
 
-.checklist-table th {
-  background-color: #f9f5eb;
-  color: #064e43;
-  font-weight: 700;
-  padding: 14px 18px;
+.feature-table th,
+.feature-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1e6d9;
+  color: #073c3b;
+  font-size: 14px;
   text-align: left;
-  border-bottom: 2px solid #f2e6d9;
-}
-
-.checklist-table td {
-  padding: 14px 18px;
-  border-bottom: 1px solid #f9f5eb;
   vertical-align: middle;
 }
 
-/* Custom Checkbox Vibe */
-.checkbox-container input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: #064e43;
+.feature-table th {
+  background: #fff8ee;
+  font-weight: 900;
+}
+
+.feature-table tr:last-child td {
+  border-bottom: none;
+}
+
+.empty-table-cell {
+  color: #7b746c;
+  text-align: center;
+}
+
+.check-toggle {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #2f9b65;
+  border-radius: 7px;
+  background: transparent;
+  color: #fff;
+  display: inline-grid;
+  place-items: center;
   cursor: pointer;
 }
 
-/* Row states */
-.row-completed {
-  background-color: #faf8f5;
+.check-toggle.checked {
+  background: #2f9b65;
 }
 
-.text-completed {
+.completed-row {
+  background: #f9f6ef;
+}
+
+.completed-text {
+  color: #8d867e;
   text-decoration: line-through;
-  color: #a0b0ad;
 }
 
-/* Action Utility Buttons */
-.checklist-actions {
+.table-actions {
   display: flex;
   gap: 8px;
+  justify-content: flex-start;
 }
 
-.btn-edit, .btn-save, .btn-delete {
-  padding: 6px 12px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-family: 'Quicksand', sans-serif;
-}
-
-.btn-edit {
-  background-color: #e6f2f0;
-  color: #064e43;
-}
-
-.btn-save {
-  background-color: #d1e7dd;
-  color: #0f5132;
-}
-
-.btn-delete {
-  background-color: #f8d7da;
-  color: #842029;
-}
-
-button:disabled {
-  opacity: 0.5;
+.table-actions button:disabled {
+  opacity: 0.45;
   cursor: not-allowed;
 }

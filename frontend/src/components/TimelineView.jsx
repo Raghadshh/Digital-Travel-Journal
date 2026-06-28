@@ -1,78 +1,61 @@
-// src/components/TimelineView.jsx
-import React from "react";
-import { MapPin, Calendar, Plane, Car, Train, PersonStanding } from "lucide-react";
+import { CalendarDays, Car, MapPin, PersonStanding, Plane, Train } from "lucide-react";
 import "../styles/TimelineView.css";
 
-export default function TimelineView({ entries = [] }) {
-  // Sort entries chronologically by date (Oldest to Newest)
-  const sortedEntries = [...entries].sort((a, b) => {
-    return new Date(a.entry_date) - new Date(b.entry_date);
-  });
+function getTransportIcon(type) {
+  switch (type) {
+    case "Car":
+      return <Car size={16} />;
+    case "Train":
+      return <Train size={16} />;
+    case "Walking":
+      return <PersonStanding size={16} />;
+    default:
+      return <Plane size={16} />;
+  }
+}
 
-  // Helper to render the correct transportation icon
-  const getTransportIcon = (type) => {
-    switch (type) {
-      case "Plane": return <Plane size={16} />;
-      case "Car": return <Car size={16} />;
-      case "Train": return <Train size={16} />;
-      case "Walking": return <PersonStanding size={16} />;
-      default: return null;
-    }
-  };
+function getEntryDate(entry) {
+  return entry.start_date || entry.entry_date || "";
+}
+
+export default function TimelineView({ entries = [] }) {
+  const sortedEntries = [...entries].sort((a, b) => new Date(getEntryDate(a)) - new Date(getEntryDate(b)));
 
   return (
     <div className="timeline-view-container">
-      <h2 className="timeline-view-title">My Adventure Storyline</h2>
-      <p className="timeline-view-subtitle">A chronological journey through your documented travels.</p>
-
-      <div className="storyline-wrapper">
-        {sortedEntries.length === 0 ? (
-          <p className="empty-timeline-state">
-            No journal entries found. Go to "New Entry" to start pinning memories to your timeline!
-          </p>
-        ) : (
-          <div className="storyline">
-            {sortedEntries.map((entry, index) => (
-              <div key={entry.id || index} className="storyline-item">
-                
-                {/* Center Node / Dot */}
-                <div className="storyline-badge">
-                  {getTransportIcon(entry.transportation)}
-                </div>
-
-                {/* Content Card */}
-                <div className="storyline-card">
-                  <div className="storyline-card-header">
-                    <span className="storyline-date">
-                      <Calendar size={14} style={{ marginRight: '4px' }} />
-                      {entry.entry_date}
-                    </span>
-                    {entry.location && (
-                      <span className="storyline-location">
-                        <MapPin size={14} style={{ marginRight: '2px' }} />
-                        {entry.location}
-                      </span>
-                    )}
-                  </div>
-
-                  <h3 className="storyline-entry-title">{entry.title || "Untitled Adventure"}</h3>
-                  
-                  {entry.notes && (
-                    <p className="storyline-notes">{entry.notes}</p>
-                  )}
-                  
-                  <div className="storyline-footer">
-                    <span className="transport-badge-label">
-                      Traveled via {entry.transportation || "Plane"}
-                    </span>
-                  </div>
-                </div>
-
-              </div>
-            ))}
-          </div>
-        )}
+      <div className="feature-panel-header timeline-heading">
+        <div>
+          <h2>My Travel Timeline</h2>
+          <p>A chronological story of your saved memories.</p>
+        </div>
       </div>
+
+      {sortedEntries.length === 0 ? (
+        <div className="empty-timeline-state">No journal entries yet. Create a new entry to start your timeline.</div>
+      ) : (
+        <div className="storyline">
+          {sortedEntries.map((entry) => (
+            <article key={entry.id} className="storyline-item">
+              <div className="storyline-badge">{getTransportIcon(entry.transportation)}</div>
+              <div className="storyline-card">
+                <div className="storyline-card-header">
+                  <span>
+                    <CalendarDays size={14} /> {getEntryDate(entry)}
+                  </span>
+                  {entry.location && (
+                    <span>
+                      <MapPin size={14} /> {entry.location}
+                    </span>
+                  )}
+                </div>
+                <h3>{entry.title || "Untitled Adventure"}</h3>
+                {entry.notes && <p>{entry.notes}</p>}
+                <small>Traveled via {entry.transportation || "Plane"}</small>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

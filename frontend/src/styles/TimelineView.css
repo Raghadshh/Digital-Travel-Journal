@@ -1,111 +1,101 @@
-/* src/styles/TimelineView.css */
 .timeline-view-container {
-  max-width: 800px;
-  margin: 1rem auto;
-  padding: 1rem;
-  font-family: 'Quicksand', sans-serif;
-  color: #003e3a;
+  max-width: 860px;
+  margin: 0 auto;
 }
 
-.timeline-view-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #064e43;
-  margin-bottom: 0.2rem;
+.timeline-heading {
+  align-items: flex-start;
 }
 
-.timeline-view-subtitle {
-  color: #a0b0ad;
-  margin-bottom: 2.5rem;
-  font-size: 1rem;
-}
-
-.storyline-wrapper {
-  position: relative;
-  padding-left: 25px;
+.timeline-heading p {
+  margin: 6px 0 0;
+  color: #7b746c;
+  font-size: 14px;
+  font-weight: 800;
 }
 
 .empty-timeline-state {
-  color: #a0b0ad;
+  border: 1px dashed #eadfce;
+  border-radius: 12px;
+  background: #fffdf9;
+  padding: 40px 18px;
+  color: #7b746c;
   text-align: center;
-  padding: 3rem 0;
-  font-style: italic;
+  font-weight: 800;
 }
 
-/* The physical vertical timeline track line */
 .storyline {
   position: relative;
-  border-left: 3px dashed #cbbba0; /* Pretty warm dashed line look */
+  display: grid;
+  gap: 20px;
+  padding-left: 28px;
+}
+
+.storyline::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 14px;
+  border-left: 2px dashed #ffd8b0;
 }
 
 .storyline-item {
   position: relative;
-  margin-bottom: 2.5rem;
-  padding-left: 30px;
 }
 
-/* The circle badge that holds the transport icon */
 .storyline-badge {
   position: absolute;
-  left: -17px;
-  top: 10px;
+  left: -28px;
+  top: 14px;
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background-color: #f6e6dc;
-  color: #8c431d;
-  border: 2px solid #8c431d;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
+  background: #fff1df;
+  color: #f47b38;
+  border: 2px solid #f47b38;
+  display: grid;
+  place-items: center;
+  z-index: 1;
 }
 
-/* Entry Box Cards */
 .storyline-card {
-  background-color: #fffdfa;
-  border: 2px solid #f2e6d9;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+  border: 1px solid #eadfce;
+  border-radius: 12px;
+  background: #fffdf9;
+  padding: 18px 20px;
 }
 
 .storyline-card-header {
   display: flex;
-  gap: 15px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #8c431d;
-  margin-bottom: 0.6rem;
   flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 10px;
 }
 
-.storyline-date, .storyline-location {
-  display: flex;
+.storyline-card-header span {
+  display: inline-flex;
   align-items: center;
+  gap: 5px;
+  color: #a35b23;
+  font-size: 12px;
+  font-weight: 900;
 }
 
-.storyline-entry-title {
-  margin: 0 0 0.8rem 0;
-  font-size: 1.3rem;
-  color: #064e43;
+.storyline-card h3 {
+  margin: 0 0 10px;
+  color: #073c3b;
+  font-size: 22px;
 }
 
-.storyline-notes {
-  margin: 0 0 1rem 0;
-  font-size: 0.95rem;
-  color: #4a5554;
-  line-height: 1.5;
-  white-space: pre-wrap;
+.storyline-card p {
+  margin: 0 0 12px;
+  color: #403b36;
+  line-height: 1.55;
+  font-weight: 800;
 }
 
-.storyline-footer {
-  border-top: 1px dashed #f2e6d9;
-  padding-top: 0.6rem;
-}
-
-.transport-badge-label {
-  font-size: 0.8rem;
-  color: #a0b0ad;
-  font-weight: 500;
+.storyline-card small {
+  color: #7b746c;
+  font-weight: 900;
 }
