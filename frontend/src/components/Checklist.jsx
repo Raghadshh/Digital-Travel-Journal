@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Check, Pencil, Plus, Trash2 } from "lucide-react";
 import "../styles/Checklist.css";
 
-export default function Checklist({ storageKey = "travel_journal_checklist" }) {
+export default function Checklist({ storageKey = "travel_journal_checklist", token = "", apiUrl = "" }) {
   const [items, setItems] = useState(() => {
     const saved = window.localStorage.getItem(storageKey);
     return saved ? JSON.parse(saved) : [];
@@ -10,10 +10,77 @@ export default function Checklist({ storageKey = "travel_journal_checklist" }) {
   const [inputValue, setInputValue] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState("");
+  const [isHydrated, setIsHydrated] = useState(!token);
 
   useEffect(() => {
+    let ignore = false;
+
+    async function fetchItems() {
+      if (!token || !apiUrl) {
+        const saved = window.localStorage.getItem(storageKey);
+        setItems(saved ? JSON.parse(saved) : []);
+        setIsHydrated(true);
+        return;
+      }
+
+      setIsHydrated(false);
+      try {
+        const response = await fetch(`${apiUrl}/planning/checklist`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!response.ok) {
+          throw new Error("Checklist sync failed.");
+        }
+        const data = await response.json();
+        if (!ignore) {
+          setItems(data);
+          setIsHydrated(true);
+        }
+      } catch (error) {
+        console.error("Using local checklist fallback:", error);
+        if (!ignore) {
+          const saved = window.localStorage.getItem(storageKey);
+          setItems(saved ? JSON.parse(saved) : []);
+          setIsHydrated(true);
+        }
+      }
+    }
+
+    fetchItems();
+
+    return () => {
+      ignore = true;
+    };
+  }, [apiUrl, storageKey, token]);
+
+  useEffect(() => {
+    if (!isHydrated) {
+      return;
+    }
+
     window.localStorage.setItem(storageKey, JSON.stringify(items));
-  }, [items, storageKey]);
+
+    if (!token || !apiUrl) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        await fetch(`${apiUrl}/planning/checklist`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(items.map(({ text, completed }) => ({ text, completed })))
+        });
+      } catch (error) {
+        console.error("Checklist stayed local because backend sync failed:", error);
+      }
+    }, 250);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [apiUrl, isHydrated, items, storageKey, token]);
 
   function handleAddItem(event) {
     event.preventDefault();
@@ -78,63 +145,46 @@ export default function Checklist({ storageKey = "travel_journal_checklist" }) {
         </button>
       </form>
 
-      <div className="feature-table-wrap">
-        <table className="feature-table">
-          <thead>
-            <tr>
-              <th>Done</th>
-              <th>Task</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.length === 0 ? (
-              <tr>
-                <td colSpan="3" className="empty-table-cell">No checklist items yet.</td>
-              </tr>
-            ) : (
-              items.map((item) => (
-                <tr key={item.id} className={item.completed ? "completed-row" : ""}>
-                  <td>
-                    <button
-                      type="button"
-                      className={`check-toggle ${item.completed ? "checked" : ""}`}
-                      onClick={() => handleToggleComplete(item.id)}
-                      aria-label="Toggle checklist item"
-                    >
-                      {item.completed && <Check size={14} />}
-                    </button>
-                  </td>
-                  <td>
-                    {editingId === item.id ? (
-                      <input
-                        className="inline-edit-input"
-                        value={editValue}
-                        onChange={(event) => setEditValue(event.target.value)}
-                      />
-                    ) : (
-                      <span className={item.completed ? "completed-text" : ""}>{item.text}</span>
-                    )}
-                  </td>
-                  <td>
-                    <div className="table-actions">
-                      {editingId === item.id ? (
-                        <button type="button" onClick={() => handleSaveEdit(item.id)}>Save</button>
-                      ) : (
-                        <button type="button" onClick={() => startEdit(item)} disabled={item.completed}>
-                          <Pencil size={14} />
-                        </button>
-                      )}
-                      <button type="button" onClick={() => handleDeleteItem(item.id)}>
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      <div className="checklist-items-card">
+        {items.length === 0 ? (
+          <p className="empty-checklist">No checklist items yet.</p>
+        ) : (
+          items.map((item) => (
+            <div key={item.id} className={`checklist-line ${item.completed ? "completed-row" : ""}`}>
+              <button
+                type="button"
+                className={`check-toggle ${item.completed ? "checked" : ""}`}
+                onClick={() => handleToggleComplete(item.id)}
+                aria-label="Toggle checklist item"
+              >
+                {item.completed && <Check size={15} />}
+              </button>
+
+              {editingId === item.id ? (
+                <input
+                  className="inline-edit-input"
+                  value={editValue}
+                  onChange={(event) => setEditValue(event.target.value)}
+                />
+              ) : (
+                <span className={item.completed ? "completed-text" : ""}>{item.text}</span>
+              )}
+
+              <div className="table-actions">
+                {editingId === item.id ? (
+                  <button type="button" className="save-action" onClick={() => handleSaveEdit(item.id)}>Save</button>
+                ) : (
+                  <button type="button" onClick={() => startEdit(item)} disabled={item.completed} aria-label="Edit checklist item">
+                    <Pencil size={14} />
+                  </button>
+                )}
+                <button type="button" className="danger-action" onClick={() => handleDeleteItem(item.id)} aria-label="Delete checklist item">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
