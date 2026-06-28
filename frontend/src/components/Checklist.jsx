@@ -1,117 +1,133 @@
-// src/components/Checklist.jsx
-import React, { useState } from 'react';
-import '../styles/Checklist.css';
+import { useEffect, useState } from "react";
+import { Check, Pencil, Plus, Trash2 } from "lucide-react";
+import "../styles/Checklist.css";
 
-export default function Checklist() {
-  const [items, setItems] = useState([]);
-  const [inputValue, setInputValue] = useState('');
+export default function Checklist({ storageKey = "travel_journal_checklist" }) {
+  const [items, setItems] = useState(() => {
+    const saved = window.localStorage.getItem(storageKey);
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [inputValue, setInputValue] = useState("");
   const [editingId, setEditingId] = useState(null);
-  const [editValue, setEditValue] = useState('');
+  const [editValue, setEditValue] = useState("");
 
-  const handleAddItem = (e) => {
-    e.preventDefault();
-    if (!inputValue.trim()) return;
-    
-    setItems([...items, { id: Date.now(), text: inputValue, completed: false }]);
-    setInputValue('');
-  };
+  useEffect(() => {
+    window.localStorage.setItem(storageKey, JSON.stringify(items));
+  }, [items, storageKey]);
 
-  const handleDeleteItem = (id) => {
-    setItems(items.filter(item => item.id !== id));
-  };
+  function handleAddItem(event) {
+    event.preventDefault();
+    if (!inputValue.trim()) {
+      return;
+    }
 
-  const handleToggleComplete = (id) => {
-    setItems(items.map(item => 
-      item.id === id ? { ...item, completed: !item.completed } : item
-    ));
-  };
+    setItems((current) => [
+      ...current,
+      {
+        id: crypto.randomUUID(),
+        text: inputValue.trim(),
+        completed: false
+      }
+    ]);
+    setInputValue("");
+  }
 
-  const startEdit = (id, text) => {
-    setEditingId(id);
-    setEditValue(text);
-  };
+  function handleDeleteItem(id) {
+    setItems((current) => current.filter((item) => item.id !== id));
+  }
 
-  const handleSaveEdit = (id) => {
-    if (!editValue.trim()) return;
-    setItems(items.map(item => item.id === id ? { ...item, text: editValue } : item));
+  function handleToggleComplete(id) {
+    setItems((current) =>
+      current.map((item) => (item.id === id ? { ...item, completed: !item.completed } : item))
+    );
+  }
+
+  function startEdit(item) {
+    setEditingId(item.id);
+    setEditValue(item.text);
+  }
+
+  function handleSaveEdit(id) {
+    if (!editValue.trim()) {
+      return;
+    }
+
+    setItems((current) =>
+      current.map((item) => (item.id === id ? { ...item, text: editValue.trim() } : item))
+    );
     setEditingId(null);
-  };
+    setEditValue("");
+  }
 
   return (
-    <div className="checklist-container">
-      {/* Title with the signature heart icon theme */}
-      <h2 className="checklist-title">
-        Checklist
-      </h2>
-      
-      {/* Input Form */}
-      <form onSubmit={handleAddItem} className="checklist-form">
-        <input 
-          type="text" 
-          className="checklist-input"
-          placeholder="e.g. Bring passport and local currency" 
+    <div className="checklist-panel">
+      <div className="feature-panel-header">
+        <h2>Trip Checklist</h2>
+        <span>{items.filter((item) => item.completed).length}/{items.length}</span>
+      </div>
+
+      <form className="checklist-form" onSubmit={handleAddItem}>
+        <input
+          type="text"
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={(event) => setInputValue(event.target.value)}
+          placeholder="Add a checklist item..."
         />
-        <button type="submit" className="btn-add">Add Item</button>
+        <button type="submit" aria-label="Add checklist item">
+          <Plus size={18} />
+        </button>
       </form>
 
-      {/* Table Section */}
-      <div className="checklist-table-wrapper">
-        <table className="checklist-table">
+      <div className="feature-table-wrap">
+        <table className="feature-table">
           <thead>
             <tr>
-              <th style={{ width: '60px' }}>Done</th>
-              <th>Task Item</th>
-              <th style={{ width: '150px' }}>Actions</th>
+              <th>Done</th>
+              <th>Task</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {items.length === 0 ? (
               <tr>
-                <td colSpan="3" style={{ textAlign: 'center', color: '#a0b0ad', padding: '2rem' }}>
-                  Your checklist is empty. Start adding tasks above!
-                </td>
+                <td colSpan="3" className="empty-table-cell">No checklist items yet.</td>
               </tr>
             ) : (
-              items.map(item => (
-                <tr key={item.id} className={item.completed ? 'row-completed' : ''}>
-                  <td className="checkbox-container">
-                    <input 
-                      type="checkbox" 
-                      checked={item.completed} 
-                      onChange={() => handleToggleComplete(item.id)}
-                    />
+              items.map((item) => (
+                <tr key={item.id} className={item.completed ? "completed-row" : ""}>
+                  <td>
+                    <button
+                      type="button"
+                      className={`check-toggle ${item.completed ? "checked" : ""}`}
+                      onClick={() => handleToggleComplete(item.id)}
+                      aria-label="Toggle checklist item"
+                    >
+                      {item.completed && <Check size={14} />}
+                    </button>
                   </td>
                   <td>
                     {editingId === item.id ? (
-                      <input 
-                        type="text" 
-                        value={editValue} 
-                        onChange={(e) => setEditValue(e.target.value)}
-                        className="checklist-input"
-                        style={{ padding: '0.4rem 0.8rem' }}
+                      <input
+                        className="inline-edit-input"
+                        value={editValue}
+                        onChange={(event) => setEditValue(event.target.value)}
                       />
                     ) : (
-                      <span className={item.completed ? 'text-completed' : ''}>
-                        {item.text}
-                      </span>
+                      <span className={item.completed ? "completed-text" : ""}>{item.text}</span>
                     )}
                   </td>
                   <td>
-                    <div className="checklist-actions">
+                    <div className="table-actions">
                       {editingId === item.id ? (
-                        <button className="btn-save" onClick={() => handleSaveEdit(item.id)}>Save</button>
+                        <button type="button" onClick={() => handleSaveEdit(item.id)}>Save</button>
                       ) : (
-                        <button 
-                          className="btn-edit" 
-                          onClick={() => startEdit(item.id, item.text)} 
-                          disabled={item.completed}
-                        >
-                          Edit
+                        <button type="button" onClick={() => startEdit(item)} disabled={item.completed}>
+                          <Pencil size={14} />
                         </button>
                       )}
-                      <button className="btn-delete" onClick={() => handleDeleteItem(item.id)}>Delete</button>
+                      <button type="button" onClick={() => handleDeleteItem(item.id)}>
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                   </td>
                 </tr>

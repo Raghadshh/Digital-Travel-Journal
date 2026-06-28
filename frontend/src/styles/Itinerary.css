@@ -1,174 +1,135 @@
-/* src/styles/Itinerary.css */
-.itinerary-container {
-  max-width: 800px;
-  margin: 1rem auto;
-  padding: 1rem;
-  font-family: 'Quicksand', sans-serif;
-  color: #003e3a;
+.planning-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 24px;
+  align-items: start;
 }
 
-.itinerary-title {
-  font-family: inherit;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #064e43;
-  margin-top: 0;
-  margin-bottom: 1.5rem;
+.itinerary-panel {
+  min-width: 0;
 }
 
-/* Entry Form Blocks */
 .itinerary-form-box {
-  background-color: #fffdfa;
-  border: 2px solid #f2e6d9;
-  border-radius: 18px;
-  padding: 1.5rem;
-  margin-bottom: 2.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) 44px;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
-.form-row-top, .form-row-bottom {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+.itinerary-form-box input,
+.itinerary-edit-grid input {
+  height: 44px;
+  margin: 0;
+  border: 1px solid #eadfce;
+  border-radius: 10px;
+  background: #fffdf9;
+  box-shadow: none;
+  font-size: 14px;
 }
 
-.itinerary-input {
-  padding: 0.6rem 1rem;
-  font-size: 0.95rem;
-  border: 2px solid #f2e6d9;
-  border-radius: 12px;
-  background-color: #fffdfa;
-  color: #333;
-  outline: none;
-  font-family: 'Quicksand', sans-serif;
-}
-
-.text-field {
-  flex: 1;
-  min-width: 200px;
-}
-
-.btn-add-activity {
-  padding: 0.6rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 700;
-  background-color: #f6e6dc;
-  color: #8c431d;
-  border: 2px solid #8c431d;
-  border-radius: 12px;
+.itinerary-form-box button,
+.itinerary-edit-grid button {
+  min-height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: #2f9b65;
+  color: #fff;
+  display: inline-grid;
+  place-items: center;
+  font-family: inherit;
+  font-weight: 900;
   cursor: pointer;
-  font-family: 'Quicksand', sans-serif;
-  transition: all 0.2s ease;
 }
 
-.btn-add-activity:hover {
-  background-color: #8c431d;
-  color: #fffdfa;
-}
-
-/* Timeline Layout Setup */
-.timeline-wrapper {
+.itinerary-list {
   position: relative;
-  padding-left: 20px;
+  display: grid;
+  gap: 14px;
+  padding-left: 18px;
 }
 
-.empty-state {
-  color: #a0b0ad;
-  text-align: center;
-  padding: 2rem 0;
-}
-
-/* The vertical timeline running line */
-.timeline {
-  position: relative;
-  border-left: 3px solid #f2e6d9;
-}
-
-.timeline-item {
-  position: relative;
-  margin-bottom: 1.5rem;
-  padding-left: 25px;
-}
-
-/* Timeline ring dots */
-.timeline-badge {
+.itinerary-list::before {
+  content: "";
   position: absolute;
-  left: -7px;
+  left: 5px;
+  top: 8px;
+  bottom: 8px;
+  border-left: 2px dashed #ffd8b0;
+}
+
+.empty-itinerary {
+  margin: 0;
+  border: 1px dashed #eadfce;
+  border-radius: 12px;
+  padding: 22px;
+  color: #7b746c;
+  text-align: center;
+  font-weight: 800;
+}
+
+.itinerary-item {
+  position: relative;
+}
+
+.itinerary-dot {
+  position: absolute;
+  left: -18px;
   top: 18px;
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background-color: #fffdfa;
-  border: 3px solid #8c431d;
-  z-index: 2;
+  background: #f47b38;
+  border: 3px solid #fffdf9;
+  z-index: 1;
 }
 
-/* Individual Event Blocks */
-.timeline-card {
-  background-color: #fffdfa;
-  border: 2px solid #f2e6d9;
-  border-radius: 16px;
-  padding: 1.2rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.01);
-}
-
-.view-mode-flex {
+.itinerary-card {
+  border: 1px solid #eadfce;
+  border-radius: 12px;
+  background: #fffdf9;
+  padding: 14px;
   display: flex;
   justify-content: space-between;
+  gap: 12px;
+}
+
+.itinerary-time,
+.itinerary-card p {
+  display: inline-flex;
   align-items: center;
-  gap: 15px;
+  gap: 5px;
+  color: #a35b23;
+  font-size: 12px;
+  font-weight: 900;
 }
 
-.activity-details {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.itinerary-card h3 {
+  margin: 6px 0;
+  color: #073c3b;
+  font-size: 18px;
 }
 
-.activity-timestamp {
-  font-size: 0.85rem;
-  color: #8c431d;
-  font-weight: 700;
-}
-
-.activity-name {
+.itinerary-card p {
   margin: 0;
-  font-size: 1.15rem;
-  color: #064e43;
+  color: #665d53;
 }
 
-.activity-venue {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-/* Inline Editing Utility Fields Layout */
-.edit-mode-grid {
-  display: flex;
-  flex-direction: column;
+.itinerary-edit-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
-/* Control Buttons Layout */
-.action-buttons {
-  display: flex;
-  gap: 8px;
+@media (max-width: 980px) {
+  .planning-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.btn-edit-act, .btn-delete-act, .btn-save-act, .btn-cancel-act {
-  padding: 6px 12px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-family: 'Quicksand', sans-serif;
+@media (max-width: 640px) {
+  .itinerary-form-box,
+  .itinerary-edit-grid {
+    grid-template-columns: 1fr;
+  }
 }
-
-.btn-edit-act { background-color: #e6f2f0; color: #064e43; }
-.btn-delete-act { background-color: #f8d7da; color: #842029; }
-.btn-save-act { background-color: #d1e7dd; color: #0f5132; }
-.btn-cancel-act { background-color: #e2e3e5; color: #383d41; }

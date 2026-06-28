@@ -1,155 +1,170 @@
-// src/components/Itinerary.jsx
-import React, { useState } from 'react';
-import '../styles/Itinerary.css';
+import { useEffect, useMemo, useState } from "react";
+import { Clock, MapPin, Pencil, Plus, Trash2 } from "lucide-react";
+import "../styles/Itinerary.css";
 
-export default function Itinerary() {
-  const [activities, setActivities] = useState([]);
-  const [form, setForm] = useState({ date: '', time: '', activity: '', location: '' });
-  const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ date: '', time: '', activity: '', location: '' });
+const emptyActivity = {
+  date: "",
+  time: "",
+  activity: "",
+  location: ""
+};
 
-  // Handle Input Changes for adding
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  // Handle Input Changes for editing
-  const handleEditChange = (e) => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
-  };
-
-  // Add Activity
-  const handleAddActivity = (e) => {
-    e.preventDefault();
-    if (!form.date || !form.activity.trim()) return;
-
-    const newActivity = {
-      id: Date.now(),
-      ...form
-    };
-
-    setActivities([...activities, newActivity]);
-    setForm({ date: '', time: '', activity: '', location: '' }); // Clear form
-  };
-
-  // Delete Activity
-  const handleDelete = (id) => {
-    setActivities(activities.filter(act => act.id !== id));
-  };
-
-  // Start Editing
-  const startEdit = (act) => {
-    setEditingId(act.id);
-    setEditForm({ date: act.date, time: act.time, activity: act.activity, location: act.location });
-  };
-
-  // Save Edit
-  const handleSaveEdit = (id) => {
-    if (!editForm.date || !editForm.activity.trim()) return;
-    
-    setActivities(activities.map(act => act.id === id ? { ...act, ...editForm } : act));
-    setEditingId(null);
-  };
-
-  // Sort activities chronologically by Date, then by Time
-  const sortedActivities = [...activities].sort((a, b) => {
-    const dateA = new Date(`${a.date}T${a.time || '00:00'}`);
-    const dateB = new Date(`${b.date}T${b.time || '00:00'}`);
-    return dateA - dateB;
+export default function Itinerary({ storageKey = "travel_journal_itinerary" }) {
+  const [activities, setActivities] = useState(() => {
+    const saved = window.localStorage.getItem(storageKey);
+    return saved ? JSON.parse(saved) : [];
   });
+  const [form, setForm] = useState(emptyActivity);
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState(emptyActivity);
+
+  useEffect(() => {
+    window.localStorage.setItem(storageKey, JSON.stringify(activities));
+  }, [activities, storageKey]);
+
+  const sortedActivities = useMemo(
+    () =>
+      [...activities].sort((a, b) => {
+        const first = new Date(`${a.date}T${a.time || "00:00"}`);
+        const second = new Date(`${b.date}T${b.time || "00:00"}`);
+        return first - second;
+      }),
+    [activities]
+  );
+
+  function handleChange(event) {
+    setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
+  }
+
+  function handleEditChange(event) {
+    setEditForm((current) => ({ ...current, [event.target.name]: event.target.value }));
+  }
+
+  function handleAddActivity(event) {
+    event.preventDefault();
+    if (!form.date || !form.activity.trim()) {
+      return;
+    }
+
+    setActivities((current) => [
+      ...current,
+      {
+        id: crypto.randomUUID(),
+        ...form,
+        activity: form.activity.trim(),
+        location: form.location.trim()
+      }
+    ]);
+    setForm(emptyActivity);
+  }
+
+  function startEdit(activity) {
+    setEditingId(activity.id);
+    setEditForm({
+      date: activity.date,
+      time: activity.time,
+      activity: activity.activity,
+      location: activity.location
+    });
+  }
+
+  function handleSaveEdit(id) {
+    if (!editForm.date || !editForm.activity.trim()) {
+      return;
+    }
+
+    setActivities((current) =>
+      current.map((activity) =>
+        activity.id === id
+          ? {
+              ...activity,
+              ...editForm,
+              activity: editForm.activity.trim(),
+              location: editForm.location.trim()
+            }
+          : activity
+      )
+    );
+    setEditingId(null);
+  }
+
+  function handleDelete(id) {
+    setActivities((current) => current.filter((activity) => activity.id !== id));
+  }
 
   return (
-    <div className="itinerary-container">
-      <h2 className="itinerary-title">Trip Itinerary Timeline</h2>
+    <div className="itinerary-panel">
+      <div className="feature-panel-header">
+        <h2>Trip Itinerary</h2>
+        <span>{activities.length} plans</span>
+      </div>
 
-      {/* Input Form Box */}
-      <form onSubmit={handleAddActivity} className="itinerary-form-box">
-        <div className="form-row-top">
-          <input 
-            type="date" 
-            name="date" 
-            value={form.date} 
-            onChange={handleChange} 
-            className="itinerary-input" 
-            required 
-          />
-          <input 
-            type="time" 
-            name="time" 
-            value={form.time} 
-            onChange={handleChange} 
-            className="itinerary-input" 
-          />
-        </div>
-        <div className="form-row-bottom">
-          <input 
-            type="text" 
-            name="activity" 
-            placeholder="What are you doing? (e.g. Sushi Dinner)" 
-            value={form.activity} 
-            onChange={handleChange} 
-            className="itinerary-input text-field" 
-            required 
-          />
-          <input 
-            type="text" 
-            name="location" 
-            placeholder="Where? (optional)" 
-            value={form.location} 
-            onChange={handleChange} 
-            className="itinerary-input text-field" 
-          />
-          <button type="submit" className="btn-add-activity">Add to Timeline</button>
-        </div>
+      <form className="itinerary-form-box" onSubmit={handleAddActivity}>
+        <input type="date" name="date" value={form.date} onChange={handleChange} required />
+        <input type="time" name="time" value={form.time} onChange={handleChange} />
+        <input
+          type="text"
+          name="activity"
+          placeholder="Activity"
+          value={form.activity}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="text"
+          name="location"
+          placeholder="Location"
+          value={form.location}
+          onChange={handleChange}
+        />
+        <button type="submit" aria-label="Add itinerary activity">
+          <Plus size={18} />
+        </button>
       </form>
 
-      {/* Itinerary Timeline Display */}
-      <div className="timeline-wrapper">
+      <div className="itinerary-list">
         {sortedActivities.length === 0 ? (
-          <p className="empty-state">Your schedule is wide open! Add an activity above to map your journey.</p>
+          <p className="empty-itinerary">No plans yet. Add an activity to start your trip timeline.</p>
         ) : (
-          <div className="timeline">
-            {sortedActivities.map((act) => (
-              <div key={act.id} className="timeline-item">
-                
-                {/* Visual Connector Dot */}
-                <div className="timeline-badge"></div>
-
-                <div className="timeline-card">
-                  {editingId === act.id ? (
-                    /* Inline Editing Mode Fields */
-                    <div className="edit-mode-grid">
-                      <input type="date" name="date" value={editForm.date} onChange={handleEditChange} className="itinerary-input" />
-                      <input type="time" name="time" value={editForm.time} onChange={handleEditChange} className="itinerary-input" />
-                      <input type="text" name="activity" value={editForm.activity} onChange={handleEditChange} className="itinerary-input text-field" />
-                      <input type="text" name="location" value={editForm.location} onChange={handleEditChange} className="itinerary-input text-field" />
-                      <div className="action-buttons">
-                        <button type="button" className="btn-save-act" onClick={() => handleSaveEdit(act.id)}>Save</button>
-                        <button type="button" className="btn-cancel-act" onClick={() => setEditingId(null)}>Cancel</button>
-                      </div>
+          sortedActivities.map((activity) => (
+            <article key={activity.id} className="itinerary-item">
+              <div className="itinerary-dot" />
+              <div className="itinerary-card">
+                {editingId === activity.id ? (
+                  <div className="itinerary-edit-grid">
+                    <input type="date" name="date" value={editForm.date} onChange={handleEditChange} />
+                    <input type="time" name="time" value={editForm.time} onChange={handleEditChange} />
+                    <input type="text" name="activity" value={editForm.activity} onChange={handleEditChange} />
+                    <input type="text" name="location" value={editForm.location} onChange={handleEditChange} />
+                    <button type="button" onClick={() => handleSaveEdit(activity.id)}>Save</button>
+                    <button type="button" onClick={() => setEditingId(null)}>Cancel</button>
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <span className="itinerary-time">
+                        <Clock size={14} /> {activity.date}{activity.time ? ` at ${activity.time}` : ""}
+                      </span>
+                      <h3>{activity.activity}</h3>
+                      {activity.location && (
+                        <p>
+                          <MapPin size={14} /> {activity.location}
+                        </p>
+                      )}
                     </div>
-                  ) : (
-                    /* Standard Reading Mode View */
-                    <div className="view-mode-flex">
-                      <div className="activity-details">
-                        <span className="activity-timestamp">
-                          📅 {act.date} {act.time && `⏰ ${act.time}`}
-                        </span>
-                        <h3 className="activity-name">{act.activity}</h3>
-                        {act.location && <span className="activity-venue">📍 {act.location}</span>}
-                      </div>
-                      
-                      <div className="action-buttons">
-                        <button type="button" className="btn-edit-act" onClick={() => startEdit(act)}>Edit</button>
-                        <button type="button" className="btn-delete-act" onClick={() => handleDelete(act.id)}>Delete</button>
-                      </div>
+                    <div className="table-actions">
+                      <button type="button" onClick={() => startEdit(activity)}>
+                        <Pencil size={14} />
+                      </button>
+                      <button type="button" onClick={() => handleDelete(activity.id)}>
+                        <Trash2 size={14} />
+                      </button>
                     </div>
-                  )}
-                </div>
-
+                  </>
+                )}
               </div>
-            ))}
-          </div>
+            </article>
+          ))
         )}
       </div>
     </div>
