@@ -13,8 +13,20 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from .database import engine, Base, get_db
-from .models import JournalEntry, User, JournalPhoto
-from .schemas import AuthResponse, GoogleAuthRequest, JournalCreate, JournalResponse, UserCreate, UserLogin, UserUpdate
+from .models import ChecklistItem, ItineraryItem, JournalEntry, User, JournalPhoto
+from .schemas import (
+    AuthResponse,
+    ChecklistItemPayload,
+    ChecklistItemResponse,
+    GoogleAuthRequest,
+    ItineraryItemPayload,
+    ItineraryItemResponse,
+    JournalCreate,
+    JournalResponse,
+    UserCreate,
+    UserLogin,
+    UserUpdate,
+)
 Base.metadata.create_all(bind=engine)
 
 
@@ -31,6 +43,30 @@ def _ensure_sqlite_schema():
 
         if "user_id" not in journal_columns:
             connection.execute(text("ALTER TABLE journal_entries ADD COLUMN user_id INTEGER"))
+
+        if "end_date" not in journal_columns:
+            connection.execute(text("ALTER TABLE journal_entries ADD COLUMN end_date DATE"))
+
+        connection.execute(text("""
+            CREATE TABLE IF NOT EXISTS checklist_items (
+                id INTEGER PRIMARY KEY,
+                text VARCHAR(180) NOT NULL,
+                completed BOOLEAN NOT NULL DEFAULT 0,
+                user_id INTEGER NOT NULL
+            )
+        """))
+        connection.execute(text("CREATE INDEX IF NOT EXISTS ix_checklist_items_user_id ON checklist_items (user_id)"))
+        connection.execute(text("""
+            CREATE TABLE IF NOT EXISTS itinerary_items (
+                id INTEGER PRIMARY KEY,
+                date DATE NOT NULL,
+                time VARCHAR(20),
+                activity VARCHAR(180) NOT NULL,
+                location VARCHAR(180),
+                user_id INTEGER NOT NULL
+            )
+        """))
+        connection.execute(text("CREATE INDEX IF NOT EXISTS ix_itinerary_items_user_id ON itinerary_items (user_id)"))
 
 
 _ensure_sqlite_schema()
@@ -252,6 +288,7 @@ def create_journal(journal: JournalCreate, current_user: User = Depends(get_curr
         title=journal.title,
         location=journal.location,
         entry_date=journal.entry_date,
+        end_date=journal.end_date,
         notes=journal.notes,
         transportation=journal.transportation,
         user_id=current_user.id,
@@ -300,6 +337,7 @@ def edit_journal(journal_id: int, journal: JournalCreate, current_user: User = D
     entry.title = journal.title
     entry.location = journal.location
     entry.entry_date = journal.entry_date
+    entry.end_date = journal.end_date
     entry.notes = journal.notes
     entry.transportation = journal.transportation
 
@@ -320,4 +358,58 @@ def delete_journal(journal_id: int, current_user: User = Depends(get_current_use
     db.commit()
 
     return {"message": "Journal entry deleted successfully"}
+
+
+@app.get("/planning/checklist", response_model=list[ChecklistItemResponse])
+def get_checklist(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return db.query(ChecklistItem).filter(ChecklistItem.user_id == current_user.id).order_by(ChecklistItem.id.asc()).all()
+
+
+@app.put("/planning/checklist", response_model=list[ChecklistItemResponse])
+def save_checklist(items: list[ChecklistItemPayload], current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    db.query(ChecklistItem).filter(ChecklistItem.user_id == current_user.id).delete()
+
+    for item in items:
+        text_value = item.text.strip()
+        if text_value:
+            db.add(ChecklistItem(text=text_value, completed=item.completed, user_id=current_user.id))
+
+    db.commit()
+    return db.query(ChecklistItem).filter(ChecklistItem.user_id == current_user.id).order_by(ChecklistItem.id.asc()).all()
+
+
+@app.get("/planning/itinerary", response_model=list[ItineraryItemResponse])
+def get_itinerary(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return (
+        db.query(ItineraryItem)
+        .filter(ItineraryItem.user_id == current_user.id)
+        .order_by(ItineraryItem.date.asc(), ItineraryItem.time.asc())
+        .all()
+    )
+
+
+@app.put("/planning/itinerary", response_model=list[ItineraryItemResponse])
+def save_itinerary(items: list[ItineraryItemPayload], current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    db.query(ItineraryItem).filter(ItineraryItem.user_id == current_user.id).delete()
+
+    for item in items:
+        activity_value = item.activity.strip()
+        if activity_value:
+            db.add(
+                ItineraryItem(
+                    date=item.date,
+                    time=item.time or None,
+                    activity=activity_value,
+                    location=item.location.strip() if item.location else None,
+                    user_id=current_user.id,
+                )
+            )
+
+    db.commit()
+    return (
+        db.query(ItineraryItem)
+        .filter(ItineraryItem.user_id == current_user.id)
+        .order_by(ItineraryItem.date.asc(), ItineraryItem.time.asc())
+        .all()
+    )
     

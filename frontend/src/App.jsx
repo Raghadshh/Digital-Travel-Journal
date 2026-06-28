@@ -430,6 +430,7 @@ function App() {
           title: form.title,
           location: form.location,
           entry_date: form.start_date,
+          end_date: form.end_date || null,
           notes: form.notes,
           transportation: form.transportation
         })
@@ -849,8 +850,8 @@ function App() {
         ) : currentView === "itinerary" ? (
           <section className="entry-card feature-page">
             <div className="planning-grid">
-              <Checklist storageKey={`travel_journal_checklist:${userEmail}`} />
-              <Itinerary storageKey={`travel_journal_itinerary:${userEmail}`} />
+              <Checklist storageKey={`travel_journal_checklist:${userEmail}`} token={token} apiUrl={API_URL} />
+              <Itinerary storageKey={`travel_journal_itinerary:${userEmail}`} token={token} apiUrl={API_URL} />
             </div>
           </section>
         ) : currentView === "create" ? (
@@ -903,7 +904,7 @@ function App() {
                       aria-label="Start date"
                     />
                     <button type="button" className="date-picker-btn" onClick={() => openDatePicker(startDateRef)} aria-label="Open start date calendar">
-                      <span className="calendar-mark" aria-hidden="true" />
+                      <CalendarDays size={18} />
                     </button>
                   </div>
                   <span>to</span>
@@ -917,7 +918,7 @@ function App() {
                       aria-label="End date"
                     />
                     <button type="button" className="date-picker-btn" onClick={() => openDatePicker(endDateRef)} aria-label="Open end date calendar">
-                      <span className="calendar-mark" aria-hidden="true" />
+                      <CalendarDays size={18} />
                     </button>
                   </div>
                 </div>

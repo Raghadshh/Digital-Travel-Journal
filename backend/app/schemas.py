@@ -14,6 +14,7 @@ class JournalCreate(BaseModel):
     title: str
     location: str
     entry_date: date
+    end_date: date | None = None
 
     notes: str | None = None
     transportation: str | None = None
@@ -24,6 +25,7 @@ class JournalResponse(BaseModel):
     title: str
     location: str
     entry_date: date
+    end_date: date | None = None
     notes: str | None = None
     transportation: str | None = None
     user_id: int | None = None
@@ -46,6 +48,40 @@ class UserLogin(BaseModel):
 
 class UserUpdate(BaseModel):
     full_name: str | None = None
+
+
+class ChecklistItemPayload(BaseModel):
+    id: int | str | None = None
+    text: str
+    completed: bool = False
+
+
+class ChecklistItemResponse(BaseModel):
+    id: int
+    text: str
+    completed: bool
+
+    class Config:
+        from_attributes = True
+
+
+class ItineraryItemPayload(BaseModel):
+    id: int | str | None = None
+    date: date
+    time: str | None = None
+    activity: str
+    location: str | None = None
+
+
+class ItineraryItemResponse(BaseModel):
+    id: int
+    date: date
+    time: str | None = None
+    activity: str
+    location: str | None = None
+
+    class Config:
+        from_attributes = True
 
 
 class GoogleAuthRequest(BaseModel):

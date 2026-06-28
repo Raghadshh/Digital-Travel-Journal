@@ -1,5 +1,9 @@
 .checklist-panel {
   min-width: 0;
+  border: 1px solid #eadfce;
+  border-radius: 16px;
+  background: #fffdf9;
+  padding: 28px;
 }
 
 .feature-panel-header {
@@ -25,17 +29,17 @@
 
 .checklist-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 44px;
+  grid-template-columns: minmax(0, 1fr) 42px;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .checklist-form input,
 .inline-edit-input {
-  height: 44px;
+  height: 42px;
   margin: 0;
   border: 1px solid #eadfce;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #fffdf9;
   box-shadow: none;
   font-size: 14px;
@@ -43,78 +47,85 @@
 
 .checklist-form button,
 .table-actions button {
-  min-width: 36px;
-  min-height: 36px;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  max-width: 34px;
+  max-height: 34px;
   border: none;
-  border-radius: 9px;
+  border-radius: 7px;
   background: #fff1df;
   color: #f47b38;
-  display: inline-grid;
-  place-items: center;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
   font-family: inherit;
   font-weight: 900;
   cursor: pointer;
+  padding: 0 !important;
+  line-height: 1;
 }
 
-.feature-table-wrap {
-  overflow-x: auto;
-  border: 1px solid #eadfce;
-  border-radius: 12px;
-  background: #fffdf9;
+.checklist-form button {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  max-width: 42px;
+  max-height: 42px;
 }
 
-.feature-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 460px;
+.checklist-form button svg,
+.table-actions button svg {
+  display: block;
+  margin: 0;
 }
 
-.feature-table th,
-.feature-table td {
-  padding: 12px 14px;
-  border-bottom: 1px solid #f1e6d9;
-  color: #073c3b;
-  font-size: 14px;
-  text-align: left;
-  vertical-align: middle;
+.checklist-items-card {
+  display: grid;
+  gap: 12px;
 }
 
-.feature-table th {
-  background: #fff8ee;
-  font-weight: 900;
+.checklist-line {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
 }
 
-.feature-table tr:last-child td {
-  border-bottom: none;
-}
-
-.empty-table-cell {
+.empty-checklist {
+  margin: 0;
+  border-top: 1px solid #f1e6d9;
+  padding: 18px 0 0;
   color: #7b746c;
   text-align: center;
+  font-weight: 800;
 }
 
 .check-toggle {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border: 2px solid #2f9b65;
-  border-radius: 7px;
+  border-radius: 4px;
   background: transparent;
-  color: #fff;
+  color: #2f9b65;
   display: inline-grid;
   place-items: center;
   cursor: pointer;
+  padding: 0;
 }
 
 .check-toggle.checked {
-  background: #2f9b65;
+  background: #e8f7ef;
 }
 
-.completed-row {
-  background: #f9f6ef;
+.completed-row span {
+  color: #8d867e;
 }
 
 .completed-text {
-  color: #8d867e;
   text-decoration: line-through;
 }
 
@@ -127,4 +138,31 @@
 .table-actions button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.table-actions .danger-action {
+  background: #fff5f5;
+  color: #b42318;
+}
+
+.table-actions .save-action {
+  width: auto !important;
+  max-width: none;
+  padding: 0 10px !important;
+  background: #2f9b65;
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .checklist-panel {
+    padding: 22px;
+  }
+
+  .checklist-line {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+
+  .table-actions {
+    grid-column: 2;
+  }
 }

@@ -2866,3 +2866,85 @@ button {
     width: 100%;
   }
 }
+
+.date-field {
+  position: relative;
+}
+
+.date-field input[type="date"] {
+  padding-right: 48px !important;
+}
+
+.date-field input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+}
+
+.date-picker-btn {
+  position: absolute;
+  top: 50% !important;
+  right: 12px;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  transform: translateY(-50%) !important;
+  border: none;
+  border-radius: 50%;
+  background: transparent !important;
+  color: #665d53 !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0 !important;
+  z-index: 25;
+  cursor: pointer;
+}
+
+.date-picker-btn svg {
+  width: 19px !important;
+  height: 19px !important;
+  display: block !important;
+  stroke: currentColor;
+}
+
+.filter-panel {
+  align-items: end !important;
+}
+
+.clear-filter-btn {
+  align-self: end !important;
+  margin-top: 0 !important;
+  transform: none !important;
+}
+
+.feature-page {
+  max-width: 1120px;
+}
+
+.bottom-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.photo-box,
+.music-box {
+  height: 190px;
+  min-height: 190px;
+}
+
+@media (max-width: 900px) {
+  .bottom-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profile-edit-icon {
+  width: 33px !important;
+  height: 33px !important;
+  transform: translateX(0px);
+}
+
+.profile-edit-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+  stroke-width: 2.6;
+}
