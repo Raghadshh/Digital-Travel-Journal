@@ -1,22 +1,50 @@
+import base64
+import json
 import hashlib
 import hmac
 import re
 import secrets
-from fastapi import FastAPI, Depends, HTTPException
+import os
+import shutil
+from fastapi import FastAPI, Depends, Header, HTTPException, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from .database import engine, Base, get_db
-from .models import JournalEntry, User
-from .schemas import AuthResponse, JournalCreate, UserCreate, UserLogin
-
+from .models import JournalEntry, User, JournalPhoto
+from .schemas import AuthResponse, GoogleAuthRequest, JournalCreate, JournalResponse, UserCreate, UserLogin, UserUpdate
 Base.metadata.create_all(bind=engine)
+
+
+def _ensure_sqlite_schema():
+    if engine.dialect.name != "sqlite":
+        return
+
+    with engine.begin() as connection:
+        user_columns = {row[1] for row in connection.execute(text("PRAGMA table_info(users)"))}
+        journal_columns = {row[1] for row in connection.execute(text("PRAGMA table_info(journal_entries)"))}
+
+        if "full_name" not in user_columns:
+            connection.execute(text("ALTER TABLE users ADD COLUMN full_name VARCHAR(120)"))
+
+        if "user_id" not in journal_columns:
+            connection.execute(text("ALTER TABLE journal_entries ADD COLUMN user_id INTEGER"))
+
+
+_ensure_sqlite_schema()
 
 app = FastAPI()
 
+UPLOAD_DIR = "static/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -62,6 +90,38 @@ def _create_access_token(email: str) -> str:
     return secrets.token_urlsafe(24) + f"::{email}"
 
 
+def _email_from_token(authorization: str | None) -> str:
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Authentication required")
+
+    token = authorization.removeprefix("Bearer ").strip()
+    if "::" not in token:
+        raise HTTPException(status_code=401, detail="Invalid authentication token")
+
+    email = token.rsplit("::", 1)[1].strip().lower()
+    if not _is_valid_email(email):
+        raise HTTPException(status_code=401, detail="Invalid authentication token")
+
+    return email
+
+
+def get_current_user(authorization: str | None = Header(default=None), db: Session = Depends(get_db)) -> User:
+    email = _email_from_token(authorization)
+    user = db.query(User).filter(User.email == email).first()
+    if user is None:
+        raise HTTPException(status_code=401, detail="User account not found")
+    return user
+
+
+def _decode_google_payload(credential: str) -> dict:
+    try:
+        payload = credential.split(".")[1]
+        payload += "=" * (-len(payload) % 4)
+        return json.loads(base64.urlsafe_b64decode(payload.encode("utf-8")))
+    except (IndexError, ValueError, json.JSONDecodeError):
+        raise HTTPException(status_code=400, detail="Invalid Google credential")
+
+
 @app.get("/")
 def home():
     return {"message": "Travel Journal Backend Running"}
@@ -70,6 +130,15 @@ def home():
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+@app.get("/journals", response_model=list[JournalResponse])
+def get_journals(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return (
+        db.query(JournalEntry)
+        .filter(JournalEntry.user_id == current_user.id)
+        .order_by(JournalEntry.entry_date.desc())
+        .all()
+    )
 
 
 @app.post("/auth/register", response_model=AuthResponse)
@@ -89,7 +158,11 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     if existing_user is not None:
         raise HTTPException(status_code=409, detail="Email already registered")
 
-    new_user = User(email=normalized_email, password_hash=_hash_password(user.password))
+    new_user = User(
+        email=normalized_email,
+        password_hash=_hash_password(user.password),
+        full_name=user.full_name.strip() if user.full_name else None,
+    )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -97,6 +170,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     return AuthResponse(
         access_token=_create_access_token(normalized_email),
         message="Registration successful",
+        email=normalized_email,
+        name=new_user.full_name,
     )
 
 
@@ -114,6 +189,40 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
     return AuthResponse(
         access_token=_create_access_token(normalized_email),
         message="Login successful",
+        email=normalized_email,
+        name=existing_user.full_name,
+    )
+
+
+@app.post("/auth/google", response_model=AuthResponse)
+def google_auth(request: GoogleAuthRequest, db: Session = Depends(get_db)):
+    payload = _decode_google_payload(request.credential)
+    normalized_email = str(payload.get("email", "")).strip().lower()
+    name = payload.get("name")
+
+    if not normalized_email or not _is_valid_email(normalized_email):
+        raise HTTPException(status_code=400, detail="Google account did not provide a valid email")
+
+    existing_user = db.query(User).filter(User.email == normalized_email).first()
+    if existing_user is None:
+        existing_user = User(
+            email=normalized_email,
+            password_hash="google-auth:" + secrets.token_urlsafe(24),
+            full_name=name,
+        )
+        db.add(existing_user)
+        db.commit()
+        db.refresh(existing_user)
+    elif name and not existing_user.full_name:
+        existing_user.full_name = name
+        db.commit()
+        db.refresh(existing_user)
+
+    return AuthResponse(
+        access_token=_create_access_token(normalized_email),
+        message="Google login successful",
+        email=normalized_email,
+        name=existing_user.full_name or name,
     )
 
 
@@ -122,14 +231,30 @@ def logout_user():
     return {"message": "Logout successful"}
 
 
-@app.post("/journals")
-def create_journal(journal: JournalCreate, db: Session = Depends(get_db)):
+@app.put("/users/me", response_model=AuthResponse)
+def update_current_user(profile: UserUpdate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    next_name = profile.full_name.strip() if profile.full_name else None
+    current_user.full_name = next_name
+    db.commit()
+    db.refresh(current_user)
+
+    return AuthResponse(
+        access_token=_create_access_token(current_user.email),
+        message="Profile updated",
+        email=current_user.email,
+        name=current_user.full_name,
+    )
+
+
+@app.post("/journals", response_model=JournalResponse)
+def create_journal(journal: JournalCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     new_entry = JournalEntry(
         title=journal.title,
         location=journal.location,
         entry_date=journal.entry_date,
         notes=journal.notes,
         transportation=journal.transportation,
+        user_id=current_user.id,
     )
 
     db.add(new_entry)
@@ -138,9 +263,36 @@ def create_journal(journal: JournalCreate, db: Session = Depends(get_db)):
     return new_entry
 
 
+@app.post("/journals/{journal_id}/photos")
+def upload_journal_photos(
+    journal_id: int,
+    files: list[UploadFile] = File(...),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    entry = db.query(JournalEntry).filter(JournalEntry.id == journal_id, JournalEntry.user_id == current_user.id).first()
+    if not entry:
+        raise HTTPException(status_code=404, detail="Journal entry not found")
+
+    for file in files:
+        file_extension = os.path.splitext(file.filename)[1]
+        unique_filename = f"{secrets.token_hex(8)}{file_extension}"
+        file_path = os.path.join(UPLOAD_DIR, unique_filename)
+
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        photo_url = f"http://127.0.0.1:8000/static/uploads/{unique_filename}"
+        db_photo = JournalPhoto(url=photo_url, journal_id=journal_id)
+        db.add(db_photo)
+
+    db.commit()
+    return {"message": "Photos successfully saved"}
+
+
 @app.put("/journals/{journal_id}")
-def edit_journal(journal_id: int, journal: JournalCreate, db: Session = Depends(get_db)):
-    entry = db.query(JournalEntry).filter(JournalEntry.id == journal_id).first()
+def edit_journal(journal_id: int, journal: JournalCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    entry = db.query(JournalEntry).filter(JournalEntry.id == journal_id, JournalEntry.user_id == current_user.id).first()
 
     if entry is None:
         raise HTTPException(status_code=404, detail="Journal entry not found")
@@ -158,8 +310,8 @@ def edit_journal(journal_id: int, journal: JournalCreate, db: Session = Depends(
 
 
 @app.delete("/journals/{journal_id}")
-def delete_journal(journal_id: int, db: Session = Depends(get_db)):
-    entry = db.query(JournalEntry).filter(JournalEntry.id == journal_id).first()
+def delete_journal(journal_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    entry = db.query(JournalEntry).filter(JournalEntry.id == journal_id, JournalEntry.user_id == current_user.id).first()
 
     if entry is None:
         raise HTTPException(status_code=404, detail="Journal entry not found")
