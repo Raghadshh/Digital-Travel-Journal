@@ -29,6 +29,9 @@ import {
 } from "lucide-react";
 import PhotoGallery from "./components/PhotoGallery";
 import LandingPage from "./components/LandingPage";
+import Checklist from "./components/Checklist";
+import Itinerary from "./components/Itinerary";
+import TimelineView from "./components/TimelineView";
 import "./App.css";
 
 const API_URL = "http://127.0.0.1:8000";
@@ -742,13 +745,21 @@ function App() {
           >
             <Images size={18} /> My Memories
           </a>
-          <a href="#timeline">
+          <a
+            href="#timeline"
+            className={currentView === "timeline" ? "active-nav" : ""}
+            onClick={() => setCurrentView("timeline")}
+          >
             <ListTree size={18} /> Timeline
           </a>
           <a href="#capsule">
             <LockKeyhole size={18} /> Capsule
           </a>
-          <a href="#itinerary">
+          <a
+            href="#itinerary"
+            className={currentView === "itinerary" ? "active-nav" : ""}
+            onClick={() => setCurrentView("itinerary")}
+          >
             <CalendarDays size={18} /> Itinerary
           </a>
         </nav>
@@ -807,6 +818,17 @@ function App() {
                 Save Profile <ArrowRight />
               </button>
             </form>
+          </section>
+        ) : currentView === "timeline" ? (
+          <section className="entry-card feature-page">
+            <TimelineView entries={entries} />
+          </section>
+        ) : currentView === "itinerary" ? (
+          <section className="entry-card feature-page">
+            <div className="planning-grid">
+              <Checklist storageKey={`travel_journal_checklist:${userEmail}`} />
+              <Itinerary storageKey={`travel_journal_itinerary:${userEmail}`} />
+            </div>
           </section>
         ) : currentView === "create" ? (
           <section className="entry-card">

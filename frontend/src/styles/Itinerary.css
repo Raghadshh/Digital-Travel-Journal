@@ -1,0 +1,135 @@
+.planning-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.itinerary-panel {
+  min-width: 0;
+}
+
+.itinerary-form-box {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) 44px;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.itinerary-form-box input,
+.itinerary-edit-grid input {
+  height: 44px;
+  margin: 0;
+  border: 1px solid #eadfce;
+  border-radius: 10px;
+  background: #fffdf9;
+  box-shadow: none;
+  font-size: 14px;
+}
+
+.itinerary-form-box button,
+.itinerary-edit-grid button {
+  min-height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: #2f9b65;
+  color: #fff;
+  display: inline-grid;
+  place-items: center;
+  font-family: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.itinerary-list {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  padding-left: 18px;
+}
+
+.itinerary-list::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 8px;
+  bottom: 8px;
+  border-left: 2px dashed #ffd8b0;
+}
+
+.empty-itinerary {
+  margin: 0;
+  border: 1px dashed #eadfce;
+  border-radius: 12px;
+  padding: 22px;
+  color: #7b746c;
+  text-align: center;
+  font-weight: 800;
+}
+
+.itinerary-item {
+  position: relative;
+}
+
+.itinerary-dot {
+  position: absolute;
+  left: -18px;
+  top: 18px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #f47b38;
+  border: 3px solid #fffdf9;
+  z-index: 1;
+}
+
+.itinerary-card {
+  border: 1px solid #eadfce;
+  border-radius: 12px;
+  background: #fffdf9;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.itinerary-time,
+.itinerary-card p {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #a35b23;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.itinerary-card h3 {
+  margin: 6px 0;
+  color: #073c3b;
+  font-size: 18px;
+}
+
+.itinerary-card p {
+  margin: 0;
+  color: #665d53;
+}
+
+.itinerary-edit-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 980px) {
+  .planning-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .itinerary-form-box,
+  .itinerary-edit-grid {
+    grid-template-columns: 1fr;
+  }
+}

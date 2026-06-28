@@ -1,0 +1,130 @@
+.checklist-panel {
+  min-width: 0;
+}
+
+.feature-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.feature-panel-header h2 {
+  margin: 0;
+  color: #073c3b;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.feature-panel-header span {
+  color: #f47b38;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.checklist-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.checklist-form input,
+.inline-edit-input {
+  height: 44px;
+  margin: 0;
+  border: 1px solid #eadfce;
+  border-radius: 10px;
+  background: #fffdf9;
+  box-shadow: none;
+  font-size: 14px;
+}
+
+.checklist-form button,
+.table-actions button {
+  min-width: 36px;
+  min-height: 36px;
+  border: none;
+  border-radius: 9px;
+  background: #fff1df;
+  color: #f47b38;
+  display: inline-grid;
+  place-items: center;
+  font-family: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.feature-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #eadfce;
+  border-radius: 12px;
+  background: #fffdf9;
+}
+
+.feature-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 460px;
+}
+
+.feature-table th,
+.feature-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1e6d9;
+  color: #073c3b;
+  font-size: 14px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.feature-table th {
+  background: #fff8ee;
+  font-weight: 900;
+}
+
+.feature-table tr:last-child td {
+  border-bottom: none;
+}
+
+.empty-table-cell {
+  color: #7b746c;
+  text-align: center;
+}
+
+.check-toggle {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #2f9b65;
+  border-radius: 7px;
+  background: transparent;
+  color: #fff;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.check-toggle.checked {
+  background: #2f9b65;
+}
+
+.completed-row {
+  background: #f9f6ef;
+}
+
+.completed-text {
+  color: #8d867e;
+  text-decoration: line-through;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.table-actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
