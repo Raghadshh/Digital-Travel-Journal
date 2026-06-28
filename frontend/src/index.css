@@ -40,7 +40,7 @@ body {
 
 .sidebar .active {
   background: #fff0dd;
-  color: #f47b38;
+  color: #c74804;
   font-weight: bold;
 }
 
@@ -116,7 +116,7 @@ textarea {
 button {
   display: block;
   margin-left: auto;
-  background: #2f9b65;
+  background: #20804f;
   color: white;
   border: none;
   border-radius: 12px;

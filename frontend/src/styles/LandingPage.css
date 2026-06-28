@@ -63,7 +63,7 @@
 }
 
 .orange-text {
-  color: #f47b38;
+  color: #c74804;
   font-weight: 800;
 }
 
@@ -84,7 +84,7 @@
 }
 
 .get-started-btn {
-  background-color: #2f9b65;
+  background-color: #20804F;
   color: #ffffff;
   border: none;
   padding: 0.75rem 2rem;
@@ -104,8 +104,8 @@
 
 .log-in-btn {
   background-color: transparent;
-  color: #f47b38;
-  border: 2px solid #f47b38;
+  color: #c74804;
+  border: 2px solid #c74804;
   padding: 0.55rem 1.8rem;
   border-radius: 0.4rem;
   font-size: 0.95rem;

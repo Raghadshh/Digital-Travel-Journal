@@ -22,7 +22,7 @@
 }
 
 .feature-panel-header span {
-  color: #f47b38;
+  color: #c74804;
   font-size: 13px;
   font-weight: 900;
 }
@@ -55,8 +55,8 @@
   max-height: 34px;
   border: none;
   border-radius: 7px;
-  background: #fff1df;
-  color: #f47b38;
+  background: #fbf8f0;
+  color: #c74804;
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -99,7 +99,7 @@
   margin: 0;
   border-top: 1px solid #f1e6d9;
   padding: 18px 0 0;
-  color: #7b746c;
+  color: #434242;
   text-align: center;
   font-weight: 800;
 }
@@ -107,10 +107,10 @@
 .check-toggle {
   width: 22px;
   height: 22px;
-  border: 2px solid #2f9b65;
+  border: 2px solid #20804f;
   border-radius: 4px;
   background: transparent;
-  color: #2f9b65;
+  color: #20804f;
   display: inline-grid;
   place-items: center;
   cursor: pointer;
@@ -122,7 +122,7 @@
 }
 
 .completed-row span {
-  color: #8d867e;
+  color: #434242;
 }
 
 .completed-text {
@@ -149,7 +149,7 @@
   width: auto !important;
   max-width: none;
   padding: 0 10px !important;
-  background: #2f9b65;
+  background: #20804f;
   color: #fff;
 }
 

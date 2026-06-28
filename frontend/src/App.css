@@ -51,7 +51,7 @@ body {
 .auth-toggle-link {
   background: none;
   border: none;
-  color: #2f9b65;
+  color: #20804f;
   font-size: 0.9rem;
   cursor: pointer;
   text-decoration: none;
@@ -91,7 +91,7 @@ body {
   margin: 0;
   font-size: 14px;
   line-height: 1.5;
-  color: #999;
+  color: #434242;
 }
 
 .form-group {
@@ -119,7 +119,7 @@ body {
 
 .form-group input:focus {
   outline: none;
-  border-color: #2f9b65;
+  border-color: #20804f;
   background: #ffffff;
 }
 
@@ -151,7 +151,7 @@ body {
 }
 
 .forgot-password {
-  color: #2f9b65;
+  color: #20804f;
   text-decoration: none;
   font-size: 13px;
   margin-bottom: 16px;
@@ -173,7 +173,7 @@ body {
 .auth-submit {
   border: none;
   border-radius: 8px;
-  background: #2f9b65;
+  background: #20804f;
   color: white;
   padding: 14px 18px;
   font-size: 16px;
@@ -369,7 +369,7 @@ input {
 }
 
 .transport.active {
-  background: #fff1df;
+  background: #fbf8f0;
   color: #9a3412;
   box-shadow: inset 0 0 0 3px #9a3412;
   border-radius: 17px;
@@ -676,7 +676,7 @@ textarea {
 
 .photo-date {
   font-size: 13px;
-  color: #a39684;
+  color: #434242;
   font-weight: 800;
   text-align: right;
   margin-top: 6px;
@@ -906,7 +906,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .auth-toggle-link strong {
-  color: #2f9b65;
+  color: #20804f;
 }
 
 .auth-card {
@@ -975,7 +975,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   align-items: center;
   gap: 12px;
   margin: 24px 0 14px;
-  color: #7b746c;
+  color: #434242;
   font-size: 13px;
   font-weight: 700;
 }
@@ -1044,8 +1044,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .side-nav a.active-nav {
-  background: #fff1df;
-  color: #f47b38;
+  background: #fbf8f0;
+  color: #c74804;
 }
 
 .profile-card {
@@ -1104,7 +1104,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .profile-card:hover,
 .profile-card.active-profile {
-  background: #fff1df;
+  background: #fbf8f0;
   border-color: #ffd8b0;
 }
 
@@ -1146,7 +1146,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .new-entry-btn {
   border: none;
   border-radius: 9px;
-  background: #2f9b65;
+  background: #20804f;
   color: #fff;
   min-height: 38px;
   padding: 0 18px;
@@ -1248,7 +1248,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .memory-details span {
   margin-top: 4px;
-  color: #a39684;
+  color: #434242;
   font-size: 12px;
 }
 
@@ -1587,7 +1587,7 @@ select {
 }
 
 .date-range > span {
-  color: #7b746c;
+  color: #434242;
   font-size: 13px;
   font-weight: 900;
 }
@@ -1647,8 +1647,8 @@ select {
 
 .transport.active {
   background: #fff4e8;
-  color: #f47b38;
-  box-shadow: inset 0 0 0 2px #f47b38;
+  color: #c74804;
+  box-shadow: inset 0 0 0 2px #c74804;
   border-radius: 11px;
 }
 
@@ -1704,8 +1704,8 @@ select {
 }
 
 .filter-btn.active-filter {
-  background: #fff1df;
-  color: #f47b38;
+  background: #fbf8f0;
+  color: #c74804;
   border-color: #ffd8b0;
 }
 
@@ -1798,7 +1798,7 @@ select {
 }
 
 .profile-picture-btn {
-  background: #2f9b65;
+  background: #20804f;
   color: #fff;
   border: none;
 }
@@ -1893,7 +1893,7 @@ select {
 }
 
 .profile-card span {
-  color: #f47b38;
+  color: #c74804;
   font-weight: 900;
 }
 
@@ -1948,8 +1948,8 @@ select {
 }
 
 .location-suggestions button:hover {
-  background: #fff1df;
-  color: #f47b38;
+  background: #fbf8f0;
+  color: #c74804;
 }
 
 .transport-row {
@@ -2101,7 +2101,7 @@ select {
 }
 
 .memory-meta dt {
-  color: #a39684;
+  color: #434242;
   font-size: 12px;
   font-weight: 900;
 }
@@ -2201,7 +2201,7 @@ select {
   margin-top: 3px;
   display: inline-grid !important;
   place-items: center;
-  color: #f47b38;
+  color: #c74804;
 }
 
 .profile-edit-icon svg {
@@ -2770,7 +2770,7 @@ select {
   display: flex;
   justify-content: space-between;
   margin-top: -2px;
-  color: #7d7189;
+  color: #434242;
   font-size: 10px;
   font-weight: 800;
 }
