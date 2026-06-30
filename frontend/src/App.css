@@ -2948,3 +2948,88 @@ button {
   height: 18px !important;
   stroke-width: 2.6;
 }
+
+.world-map-card {
+  position: relative;
+  min-height: 560px;
+  padding: 24px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #dff7fb 0%, #f6fbef 100%);
+  border: 1px solid #eadcc8;
+  overflow: hidden;
+}
+
+.map-pin {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.map-pin:hover {
+  transform: translate(-12px, -31px) scale(1.08);
+}
+
+.map-popup {
+  position: absolute;
+  right: 90px;
+  bottom: 90px;
+  width: 390px;
+  display: flex;
+  gap: 18px;
+  padding: 20px;
+  background: #fffaf2;
+  border: 1px solid #eadcc8;
+  border-radius: 22px;
+  box-shadow: 0 18px 40px rgba(42, 31, 18, 0.16);
+  z-index: 10;
+}
+
+.map-popup-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  border: none;
+  background: transparent;
+  color: #5f5a52;
+  cursor: pointer;
+}
+
+.map-popup-img {
+  width: 125px;
+  height: 125px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.map-popup-content h2 {
+  margin: 0 0 8px;
+  color: #003f42;
+  font-size: 26px;
+}
+
+.map-popup-content p {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 7px 0;
+  color: #4b4a43;
+}
+
+.map-popup-content span {
+  display: block;
+  margin-top: 10px;
+  color: #4b4a43;
+}
+
+.view-memory-btn {
+  margin-top: 14px;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  background: #dfead4;
+  color: #23724a;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
