@@ -13,17 +13,21 @@ class PhotoResponse(BaseModel):
 class JournalCreate(BaseModel):
     title: str
     location: str
+    country: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
     entry_date: date
     end_date: date | None = None
-
     notes: str | None = None
     transportation: str | None = None
-
 
 class JournalResponse(BaseModel):
     id: int
     title: str
     location: str
+    country: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
     entry_date: date
     end_date: date | None = None
     notes: str | None = None

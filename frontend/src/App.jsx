@@ -34,12 +34,16 @@ import Checklist from "./components/Checklist";
 import Itinerary from "./components/Itinerary";
 import TimelineView from "./components/TimelineView";
 import TravelStats from "./components/TravelStats";
+import WorldMap from "./components/WorldMap";
 import "./App.css";
 
 const API_URL = "http://127.0.0.1:8000";
 const emptyEntry = {
   title: "",
   location: "",
+  country: "",
+  latitude: null,
+  longitude: null,
   start_date: "",
   end_date: "",
   notes: "",
@@ -102,6 +106,30 @@ function simplifyPlace(place) {
   }
 
   return (place.display_name || "").split(",").slice(0, 3).map((part) => part.trim()).join(", ");
+}
+
+async function geocodeLocation(location) {
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&q=${encodeURIComponent(location)}`
+  );
+
+  const data = await response.json();
+
+  if (!data.length) {
+    return {
+      country: "",
+      latitude: null,
+      longitude: null
+    };
+  }
+
+  const place = data[0];
+
+  return {
+    country: place.address?.country || "",
+    latitude: Number(place.lat),
+    longitude: Number(place.lon)
+  };
 }
 
 function GoogleIcon() {
@@ -421,6 +449,9 @@ function App() {
       return;
     }
 
+    setMessage("Finding location on map...");
+    const geo = await geocodeLocation(form.location);
+
     try {
       const response = await fetch(`${API_URL}/journals`, {
         method: "POST",
@@ -431,6 +462,9 @@ function App() {
         body: JSON.stringify({
           title: form.title,
           location: form.location,
+          country: geo.country,
+          latitude: geo.latitude,
+          longitude: geo.longitude,
           entry_date: form.start_date,
           end_date: form.end_date || null,
           notes: form.notes,
@@ -494,6 +528,9 @@ function App() {
       } else {
         const nextEntry = {
           ...form,
+          country: geo.country,
+          latitude: geo.latitude,
+          longitude: geo.longitude,
           id: savedEntry.id,
           user_email: userEmail,
           createdAt: new Date().toISOString()
@@ -509,10 +546,13 @@ function App() {
       console.error("Backend offline fallback redirection triggered:", error);
       
       const nextEntry = {
-        ...form,
-        id: crypto.randomUUID(),
-        user_email: userEmail,
-        createdAt: new Date().toISOString()
+      ...form,
+      country: geo.country,
+      latitude: geo.latitude,
+      longitude: geo.longitude,
+      id: crypto.randomUUID(),
+      user_email: userEmail,
+      createdAt: new Date().toISOString()
       };
       setEntries((current) => [nextEntry, ...current]);
       setMessage("Saved locally. Start the backend to sync entries.");
@@ -754,7 +794,11 @@ function App() {
     <div className="journal-page">
       <aside className="sidebar">
         <nav className="side-nav">
-          <a href="#map">
+          <a
+            href="#map"
+            className={currentView === "map" ? "active-nav" : ""}
+            onClick={() => setCurrentView("map")}
+          >
             <Map size={18} /> Map
           </a>
           <a
@@ -816,7 +860,11 @@ function App() {
       </aside>
 
       <main className="entry-area">
-        {currentView === "profile" ? (
+        {currentView === "map" ? (
+          <section className="entry-card feature-page">
+            <WorldMap entries={entries} onNewEntry={() => setCurrentView("create")} />
+          </section>
+        ) : currentView === "profile" ? (
           <section className="entry-card profile-page">
             <h1>Edit Profile</h1>
 
