@@ -94,3 +94,12 @@ class AuthResponse(BaseModel):
     message: str
     email: str | None = None
     name: str | None = None
+
+class TravelStatsResponse(BaseModel):
+    total_trips: int
+    total_photos: int
+    total_cities: int
+    total_countries: int
+    favorite_transport: str   
+    most_traveled_month: str    
+    longest_trip_days: int

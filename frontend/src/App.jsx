@@ -25,13 +25,15 @@ import {
   Search,
   Trash2,
   Train,
-  User
+  User,
+  BarChart2
 } from "lucide-react";
 import PhotoGallery from "./components/PhotoGallery";
 import LandingPage from "./components/LandingPage";
 import Checklist from "./components/Checklist";
 import Itinerary from "./components/Itinerary";
 import TimelineView from "./components/TimelineView";
+import TravelStats from "./components/TravelStats";
 import "./App.css";
 
 const API_URL = "http://127.0.0.1:8000";
@@ -786,6 +788,13 @@ function App() {
           >
             <CalendarDays size={18} /> Itinerary
           </a>
+          <a
+            href="#stats"
+            className={currentView === "stats" ? "active-nav" : ""}
+            onClick={() => setCurrentView("stats")}
+          >
+            <BarChart2 size={18} /> My Stats
+          </a>
         </nav>
 
         <div className="sidebar-footer">
@@ -854,6 +863,11 @@ function App() {
               <Itinerary storageKey={`travel_journal_itinerary:${userEmail}`} token={token} apiUrl={API_URL} />
             </div>
           </section>
+        ) : currentView === "stats" ? (
+          <section className="entry-card feature-page">
+            <TravelStats token={token} apiUrl={API_URL} />
+          </section>
+        
         ) : currentView === "create" ? (
           <section className="entry-card">
             <h1>

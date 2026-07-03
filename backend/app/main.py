@@ -11,6 +11,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+from collections import Counter
+from datetime import datetime
 
 from .database import engine, Base, get_db
 from .models import ChecklistItem, ItineraryItem, JournalEntry, User, JournalPhoto
@@ -26,6 +28,7 @@ from .schemas import (
     UserCreate,
     UserLogin,
     UserUpdate,
+    TravelStatsResponse,
 )
 Base.metadata.create_all(bind=engine)
 
@@ -174,6 +177,63 @@ def get_journals(current_user: User = Depends(get_current_user), db: Session = D
         .filter(JournalEntry.user_id == current_user.id)
         .order_by(JournalEntry.entry_date.desc())
         .all()
+    )
+
+@app.get("/journals/stats", response_model=TravelStatsResponse)
+def get_travel_stats(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    entries = db.query(JournalEntry).filter(JournalEntry.user_id == current_user.id).all()
+    
+    total_trips = len(entries)
+    total_photos = db.query(JournalPhoto).join(JournalEntry).filter(JournalEntry.user_id == current_user.id).count()
+    
+    cities = set()
+    countries = set()
+    
+    transport_modes = []
+    months_tracked = []
+    max_trip_duration = 0
+
+    for entry in entries:
+        if entry.transportation:
+            transport_modes.append(entry.transportation)
+            
+        if entry.entry_date:
+            months_tracked.append(entry.entry_date.strftime("%B"))
+            
+            if entry.end_date:
+                duration = (entry.end_date - entry.entry_date).days
+                duration_inclusive = duration + 1 
+                if duration_inclusive > max_trip_duration:
+                    max_trip_duration = duration_inclusive
+            else:
+                if max_trip_duration == 0:
+                    max_trip_duration = 1
+
+        if entry.location:
+            parts = [p.strip() for p in entry.location.split(",") if p.strip()]
+            if len(parts) >= 2:
+                cities.add(parts[0].lower())
+                countries.add(parts[-1].lower())
+            elif len(parts) == 1:
+                cities.add(parts[0].lower())
+                countries.add(parts[0].lower())
+
+    fav_transport = "None"
+    if transport_modes:
+        fav_transport = Counter(transport_modes).most_common(1)[0][0]
+
+    fav_month = "None"
+    if months_tracked:
+        fav_month = Counter(months_tracked).most_common(1)[0][0]
+
+    return TravelStatsResponse(
+        total_trips=total_trips,
+        total_photos=total_photos,
+        total_cities=len(cities),
+        total_countries=len(countries),
+        favorite_transport=fav_transport,
+        most_traveled_month=fav_month,
+        longest_trip_days=max_trip_duration
     )
 
 
