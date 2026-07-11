@@ -32,6 +32,7 @@ import LandingPage from "./components/LandingPage";
 import Checklist from "./components/Checklist";
 import Itinerary from "./components/Itinerary";
 import TimelineView from "./components/TimelineView";
+import CapsuleView from "./components/CapsuleView";
 import "./App.css";
 
 const API_URL = "http://127.0.0.1:8000";
@@ -776,9 +777,13 @@ function App() {
           >
             <ListTree size={18} /> Timeline
           </a>
-          <a href="#capsule">
+          <a
+            href="#capsule"
+            className={currentView === "capsule" ? "active-nav" : ""}
+            onClick={() => setCurrentView("capsule")}
+           >
             <LockKeyhole size={18} /> Capsule
-          </a>
+           </a>
           <a
             href="#itinerary"
             className={currentView === "itinerary" ? "active-nav" : ""}
@@ -853,6 +858,10 @@ function App() {
               <Checklist storageKey={`travel_journal_checklist:${userEmail}`} token={token} apiUrl={API_URL} />
               <Itinerary storageKey={`travel_journal_itinerary:${userEmail}`} token={token} apiUrl={API_URL} />
             </div>
+          </section>
+        ) : currentView === "capsule" ? (
+          <section className="entry-card feature-page">
+            <CapsuleView entries={entries} userEmail={userEmail} />
           </section>
         ) : currentView === "create" ? (
           <section className="entry-card">
