@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/CapsuleView.css';
 
-// Automated cross-fade/slide preview for attached memory photos
-const AutoSlideshow = ({ photos = [], isLocked }) => {
+  const AutoSlideshow = ({ photos = [], isLocked }) => {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     if (isLocked || !photos || photos.length <= 1) return;
+
     const interval = setInterval(() => {
       setIndex((prevIndex) => (prevIndex + 1) % photos.length);
     }, 3000);
+
     return () => clearInterval(interval);
   }, [photos, isLocked]);
 
@@ -26,13 +27,41 @@ const AutoSlideshow = ({ photos = [], isLocked }) => {
     return <div className="slideshow-placeholder">No Images Found</div>;
   }
 
-  // Handle both standard photo strings or full object instances matching App.jsx model
-  const currentPhotoUrl = typeof photos[index] === 'string' ? photos[index] : photos[index].url;
+  const currentPhoto = photos[index];
+
+  const rawPhotoUrl =
+    typeof currentPhoto === "string"
+      ? currentPhoto
+      : currentPhoto?.url ||
+        currentPhoto?.photo_url ||
+        currentPhoto?.file_url ||
+        currentPhoto?.path ||
+        currentPhoto?.file_path ||
+        currentPhoto?.filename ||
+        "";
+
+  const currentPhotoUrl =
+    rawPhotoUrl &&
+    !rawPhotoUrl.startsWith("http") &&
+    !rawPhotoUrl.startsWith("data:")
+      ? `http://127.0.0.1:8000/${rawPhotoUrl.replace(/^\/+/, "")}`
+      : rawPhotoUrl;
 
   return (
     <div className="slideshow-frame">
-      <img src={currentPhotoUrl} alt="Memory Preview" className="slideshow-img" />
-      <span className="image-counter">{index + 1}/{photos.length}</span>
+      <img
+        src={currentPhotoUrl}
+        alt="Memory Preview"
+        className="slideshow-img"
+        onError={() => {
+          console.log("Broken photo object:", currentPhoto);
+          console.log("Resolved photo URL:", currentPhotoUrl);
+        }}
+      />
+
+      <span className="image-counter">
+        {index + 1}/{photos.length}
+      </span>
     </div>
   );
 };
