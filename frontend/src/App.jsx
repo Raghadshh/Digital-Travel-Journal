@@ -1049,7 +1049,7 @@ function App() {
           <section className="entry-card memories-card">
             <div className="page-heading">
               <h1>
-                My Memories <Heart className="title-heart" size={22} fill="currentColor" />
+                My Memories
               </h1>
               <button type="button" className="new-entry-btn" onClick={() => setCurrentView("create")}>
                 + New Entry

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Camera, MapPin, Globe, Plane, Loader2, Car, CalendarDays, Hourglass } from "lucide-react";
-import "../styles/TimelineView.css";
+import { Camera, MapPin, Globe, Plane, Loader2, Car, CalendarDays, Hourglass, BarChart2 } from "lucide-react";
 
 export default function TravelStats({ token, apiUrl }) {
   const [stats, setStats] = useState(null);
@@ -36,20 +35,22 @@ export default function TravelStats({ token, apiUrl }) {
   if (error) return <div className="status-message" style={{ color: "red" }}>{error}</div>;
 
   return (
-    <div id="travel-stats-dashboard" className="timeline-view-container">
-
-      <div className="feature-panel-header timeline-heading" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div>
-          <h2>My Travel Statistics</h2>
-          <p>A summary of your travels and memories.</p>
-        </div>
+    <div id="travel-stats-dashboard">
+      
+      {/* Updated header to match the New Entry page styling */}
+      <div style={{ marginBottom: "2rem" }}>
+        <h1>
+          My Travel Statistics
+        </h1>
+        <p style={{ color: "#665d53", fontWeight: "600", fontSize: "0.95rem", marginTop: "0.5rem" }}>
+          A summary of your travels and memories.
+        </p>
       </div>
 
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-        gap: "1.5rem",
-        marginTop: "2rem"
+        gap: "1.5rem"
       }}>
         {/* Total Trips */}
         <div style={cardStyle}>
@@ -118,16 +119,17 @@ export default function TravelStats({ token, apiUrl }) {
   );
 }
 
+
 const cardStyle = {
-  backgroundColor: "#ffffff",
-  border: "1px solid #eadfce",
-  borderRadius: "16px",
+  backgroundColor: "#fffdf9",
+  border: "1px solid #eadfce", 
+  borderRadius: "12px",
   padding: "1.5rem",
-  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  textAlign: "center"
+  textAlign: "center",
+  transition: "all 0.2s ease-in-out"
 };
 
 const iconContainerStyle = {
