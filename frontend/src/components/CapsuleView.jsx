@@ -68,12 +68,22 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
     if (!selectedMemoryId) return alert("Please pick an entry from your memory log to capsule!");
 
     // Stop duplication entries
-    if (capsules.some(cap => cap.memoryId === selectedMemoryId)) {
+  if (
+    capsules.some(
+      cap => String(cap.memoryId) === String(selectedMemoryId)
+    )
+  ) {
       return alert("This memory log has already been locked inside a capsule!");
     }
 
-    const sourceEntry = userMemories.find(m => m.id === selectedMemoryId);
-    if (!sourceEntry) return;
+    const sourceEntry = userMemories.find(
+      m => String(m.id) === String(selectedMemoryId)
+    );
+  if (!sourceEntry) {
+    console.log("Selected ID:", selectedMemoryId);
+    console.log("Available memories:", userMemories);
+    return alert("The selected journal entry could not be found.");
+  }
 
     let detailString = 'Every day';
     if (freqType === 'weekly') detailString = `Every ${weeklyDay}`;
@@ -138,7 +148,9 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
           >
             <option value="">-- Choose from My Memories --</option>
             {userMemories.map(m => (
-              <option key={m.id} value={m.id}>{m.title || "Untitled"} ({m.location || "No Location"})</option>
+            <option key={m.id} value={String(m.id)}>
+              {m.title || "Untitled"} ({m.location || "No Location"})
+            </option>
             ))}
           </select>
 
@@ -188,9 +200,16 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
             <div key={capsule.id} className={`capsule-card ${capsule.isLocked ? 'card-locked' : ''}`}>
               
               {/* Delete Pin */}
-              <button className="delete-corner-btn" onClick={() => deleteCapsule(capsule.id)} title="Delete Capsule">
-                
+              <button
+                type="button"
+                className="delete-corner-btn"
+                onClick={() => deleteCapsule(capsule.id)}
+                title="Delete Capsule"
+                aria-label="Delete capsule"
+              >
+                ×
               </button>
+                
 
               <div className="card-slideshow-area">
                 <AutoSlideshow photos={capsule.photos} isLocked={capsule.isLocked} />
