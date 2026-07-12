@@ -1,0 +1,506 @@
+/* Container Layout */
+.vault-page-container {
+  padding: 10px;
+  color: #0d3b2e;
+  font-family: inherit;
+}
+
+.vault-header h1 {
+  font-size: 2.2rem;
+  margin-bottom: 5px;
+  color: #0d3b2e;
+  font-weight: bold;
+}
+
+.vault-header p {
+  color: #557a6e;
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 1.05rem;
+}
+
+/* Form Dropdown Builder Section */
+.quick-capsule-creator {
+  background: #fdfbf7;
+  border: 2px solid #ebdccb;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 12px rgba(235, 220, 203, 0.3);
+}
+
+.quick-capsule-creator h3 {
+  margin-top: 0;
+  margin-bottom: 18px;
+  font-size: 1.3rem;
+  color: #0d3b2e;
+  font-weight: bold;
+}
+
+.creator-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Unified Dropdowns & Inputs */
+.quick-capsule-creator select {
+  background-color: #ffffff;
+  border: 1px solid #ebdccb;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  color: #0d3b2e;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+  min-width: 140px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.quick-capsule-creator select:focus {
+  border-color: #134e3a;
+  box-shadow: 0 0 0 3px rgba(19, 78, 58, 0.1);
+}
+
+.quick-capsule-creator .memory-select {
+  flex: 2;
+  min-width: 250px;
+}
+
+/* Custom Checkbox Alignment */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #0d3b2e;
+  cursor: pointer;
+  user-select: none;
+  padding: 5px 10px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #134e3a;
+  cursor: pointer;
+}
+
+/* Main Action Creation Button */
+.create-capsule-btn {
+  background: #134e3a;
+  color: #ffffff;
+  padding: 11px 24px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.create-capsule-btn:hover {
+  background: #0d3b2e;
+}
+
+.create-capsule-btn:active {
+  transform: scale(0.98);
+}
+
+/* Empty State Message */
+.empty-vault-message {
+  text-align: center;
+  padding: 60px 20px;
+  background: #fdfbf7;
+  border: 2px dashed #ebdccb;
+  border-radius: 16px;
+  color: #557a6e;
+  font-size: 1.1rem;
+}
+
+/* Responsive Grid System */
+.capsules-table-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+  padding-top: 10px;
+}
+
+/* Structured Card Wrapper */
+.capsule-card {
+  background: #ffffff;
+  border: 2px solid #ebdccb;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 16px rgba(13, 59, 46, 0.04);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.capsule-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(13, 59, 46, 0.08);
+  border-color: #dcc2a9;
+}
+
+/* Distinctive styling indicator when card is locked */
+.capsule-card.card-locked {
+  border-color: #e5cfb8;
+  background-color: #faf8f5;
+}
+
+/* Delete Top-Right Corner Pin Button */
+.delete-corner-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ebdccb;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  font-size: 0.85rem;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.delete-corner-btn:hover {
+  background: #fbebe9;
+  border-color: #f5c2bc;
+  transform: scale(1.1);
+}
+
+/* Media Slideshow Area */
+.card-slideshow-area {
+  height: 220px;
+  width: 100%;
+  background-color: #f5ebd9;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid #ebdccb;
+}
+
+.slideshow-frame {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.slideshow-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-counter {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(13, 59, 46, 0.75);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Cryptographic Placeholder Layout */
+.slideshow-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #a4917d;
+  gap: 10px;
+}
+
+.slideshow-placeholder.locked-bg {
+  background: linear-gradient(135deg, #f2ece4 0%, #e8dfd3 100%);
+}
+
+.lock-icon {
+  font-size: 2.2rem;
+}
+
+.slideshow-placeholder p {
+  margin: 0;
+  font-weight: bold;
+  font-size: 0.95rem;
+  color: #8c7662;
+  letter-spacing: 0.5px;
+}
+
+/* Card Information Body */
+.card-body {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+/* Badges Meta Row */
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.transport-badge {
+  background: #f4efe8;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.date-badge {
+  font-size: 0.85rem;
+  color: #728c83;
+  font-weight: 600;
+  background: #f0f5f3;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+/* Title & Location Header styles */
+.card-title {
+  margin: 0 0 6px 0;
+  font-size: 1.4rem;
+  color: #0d3b2e;
+  font-weight: bold;
+}
+
+.card-location {
+  margin: 0 0 14px 0;
+  font-size: 0.95rem;
+  color: #c85a73;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Rich Description Content Text block */
+.card-desc {
+  margin: 0 0 20px 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #446258;
+}
+
+.card-desc.locked-text {
+  color: #a4917d;
+  font-style: italic;
+}
+
+/* Alerts and Scheduled Info Panel Box */
+.reminder-info-box {
+  background: #f4faf7;
+  border: 1px solid #d3ede2;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: auto;
+  margin-bottom: 20px;
+}
+
+.card-locked .reminder-info-box {
+  background: #f7f5f2;
+  border-color: #ebdccb;
+}
+
+.bell-icon {
+  font-size: 1.2rem;
+  margin-top: 2px;
+}
+
+.reminder-info-box small {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #7ca496;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.card-locked .reminder-info-box small {
+  color: #a4917d;
+}
+
+.reminder-info-box p {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #134e3a;
+}
+
+.card-locked .reminder-info-box p {
+  color: #5c4e40;
+}
+
+/* Bottom Action Row buttons styles */
+.card-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+.lock-btn, .schedule-trigger-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+/* Lock Action Variants toggle states */
+.lock-btn.lock-style {
+  background: #ffffff;
+  border: 1px solid #ebdccb;
+  color: #0d3b2e;
+}
+
+.lock-btn.lock-style:hover {
+  background: #fdfbf7;
+  border-color: #cbb49c;
+}
+
+.lock-btn.unlock-style {
+  background: #208263;
+  border: 1px solid #208263;
+  color: white;
+}
+
+.lock-btn.unlock-style:hover {
+  background: #18664d;
+}
+
+/* Gear Parameter Configurations Trigger Link icon */
+.schedule-trigger-btn {
+  background: #ffffff;
+  border: 1px solid #ebdccb;
+  color: #0d3b2e;
+}
+
+.schedule-trigger-btn:hover {
+  background: #fdfbf7;
+  border-color: #cbb49c;
+}
+
+/* Inline Dynamic Configuration Modal Overlay */
+.scheduler-inline-modal {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-top: 2px solid #ebdccb;
+  padding: 22px;
+  z-index: 5;
+  box-shadow: 0 -8px 24px rgba(13, 59, 46, 0.08);
+  animation: slideUp 0.25s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.scheduler-inline-modal h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 1.1rem;
+  color: #0d3b2e;
+  font-weight: bold;
+}
+
+.input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.input-row label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #557a6e;
+}
+
+.scheduler-inline-modal select {
+  background-color: #ffffff;
+  border: 1px solid #ebdccb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #0d3b2e;
+  outline: none;
+}
+
+.scheduler-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.scheduler-actions button {
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.scheduler-actions .confirm-btn {
+  background: #134e3a;
+  color: white;
+  border: none;
+}
+
+.scheduler-actions .confirm-btn:hover {
+  background: #0d3b2e;
+}
+
+.scheduler-actions .cancel-btn {
+  background: #ffffff;
+  border: 1px solid #ebdccb;
+  color: #7ca496;
+}
+
+.scheduler-actions .cancel-btn:hover {
+  background: #fdfbf7;
+  color: #557a6e;
+}
+
