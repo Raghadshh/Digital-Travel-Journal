@@ -504,3 +504,27 @@
   color: #557a6e;
 }
 
+.delete-corner-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  padding: 0;
+
+  border: 1px solid #d8cfc2;
+  border-radius: 50%;
+  background: #ffffff;
+
+  color: #8b5e4a;
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 34px;
+  text-align: center;
+
+  cursor: pointer;
+  z-index: 10;
+}
