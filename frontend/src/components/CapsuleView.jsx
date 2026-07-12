@@ -16,7 +16,7 @@ const AutoSlideshow = ({ photos = [], isLocked }) => {
   if (isLocked) {
     return (
       <div className="slideshow-placeholder locked-bg">
-        <span className="lock-icon">🔒</span>
+        <span className="lock-icon"></span>
         <p>Capsule Encrypted</p>
       </div>
     );
@@ -173,7 +173,7 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
             Lock Initially
           </label>
 
-          <button type="submit" className="create-capsule-btn">🔒 Create Capsule</button>
+          <button type="submit" className="create-capsule-btn"> Create Capsule</button>
         </div>
       </form>
 
@@ -189,7 +189,7 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
               
               {/* Delete Pin */}
               <button className="delete-corner-btn" onClick={() => deleteCapsule(capsule.id)} title="Delete Capsule">
-                ❌
+                
               </button>
 
               <div className="card-slideshow-area">
@@ -199,10 +199,10 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
               <div className="card-body">
                 <div className="card-meta">
                   <span className="transport-badge">
-                    {capsule.transportation === 'Plane' && '✈️'}
-                    {capsule.transportation === 'Car' && '🚗'}
-                    {capsule.transportation === 'Train' && '🚇'}
-                    {capsule.transportation === 'Walking' && '🚶'}
+                    {capsule.transportation === 'Plane'}
+                    {capsule.transportation === 'Car'}
+                    {capsule.transportation === 'Train'}
+                    {capsule.transportation === 'Walking'}
                   </span>
                   <span className="date-badge">
                     {capsule.endDate && capsule.endDate !== capsule.startDate 
@@ -212,7 +212,7 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
                 </div>
 
                 <h2 className="card-title">{capsule.title}</h2>
-                <p className="card-location">📍 {capsule.location}</p>
+                <p className="card-location"> {capsule.location}</p>
 
                 {!capsule.isLocked ? (
                   <p className="card-desc">{capsule.notes}</p>
@@ -221,7 +221,7 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
                 )}
 
                 <div className="reminder-info-box">
-                  <span className="bell-icon">🔔</span>
+                  <span className="bell-icon"></span>
                   <div>
                     <small>Recurrence Reminder</small>
                     <p>{capsule.reminder.type}: {capsule.reminder.detail}</p>
@@ -233,14 +233,14 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
                     className={`lock-btn ${capsule.isLocked ? 'unlock-style' : 'lock-style'}`}
                     onClick={() => toggleLock(capsule.id)}
                   >
-                    {capsule.isLocked ? '🔓 Unlock Memory' : '🔒 Lock Capsule'}
+                    {capsule.isLocked ? 'Unlock Memory' : 'Lock Capsule'}
                   </button>
 
                   <button 
                     className="schedule-trigger-btn" 
                     onClick={() => { setActiveSchedulerId(capsule.id); setFreqType('daily'); }}
                   >
-                    ⚙️ Schedule
+                    Schedule
                   </button>
                 </div>
               </div>
