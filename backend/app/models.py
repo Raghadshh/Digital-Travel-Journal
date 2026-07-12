@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String, Text, Date, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, Text, Date, ForeignKey, Float
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -22,6 +22,12 @@ class JournalEntry(Base):
     title = Column(String(100), nullable=False)
 
     location = Column(String(100), nullable=False)
+
+    country = Column(String(100))
+
+    latitude = Column(Float)
+
+    longitude = Column(Float)
 
     entry_date = Column(Date, nullable=False)
 

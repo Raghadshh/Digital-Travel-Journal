@@ -49,6 +49,15 @@ def _ensure_sqlite_schema():
 
         if "end_date" not in journal_columns:
             connection.execute(text("ALTER TABLE journal_entries ADD COLUMN end_date DATE"))
+        
+        if "country" not in journal_columns:
+            connection.execute(text("ALTER TABLE journal_entries ADD COLUMN country VARCHAR(100)"))
+
+        if "latitude" not in journal_columns:
+            connection.execute(text("ALTER TABLE journal_entries ADD COLUMN latitude FLOAT"))
+
+        if "longitude" not in journal_columns:
+            connection.execute(text("ALTER TABLE journal_entries ADD COLUMN longitude FLOAT"))
 
         connection.execute(text("""
             CREATE TABLE IF NOT EXISTS checklist_items (
@@ -347,6 +356,9 @@ def create_journal(journal: JournalCreate, current_user: User = Depends(get_curr
     new_entry = JournalEntry(
         title=journal.title,
         location=journal.location,
+        country=journal.country,
+        latitude=journal.latitude,
+        longitude=journal.longitude,
         entry_date=journal.entry_date,
         end_date=journal.end_date,
         notes=journal.notes,
@@ -396,6 +408,9 @@ def edit_journal(journal_id: int, journal: JournalCreate, current_user: User = D
 
     entry.title = journal.title
     entry.location = journal.location
+    entry.country = journal.country
+    entry.latitude = journal.latitude
+    entry.longitude = journal.longitude
     entry.entry_date = journal.entry_date
     entry.end_date = journal.end_date
     entry.notes = journal.notes
