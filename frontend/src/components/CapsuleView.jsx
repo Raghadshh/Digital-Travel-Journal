@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../styles/CapsuleView.css';
 
   const AutoSlideshow = ({ photos = [], isLocked }) => {
@@ -83,6 +83,9 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
   const [monthlyDay, setMonthlyDay] = useState(1);
   const [isLockedInitially, setIsLockedInitially] = useState(false);
   const [activeSchedulerId, setActiveSchedulerId] = useState(null);
+  const [musicTracks, setMusicTracks] = useState([]);
+  const [playingCapsuleId, setPlayingCapsuleId] = useState(null);
+  const audioRef = useRef(null);
 
   // Keep saved capsules synchronized with active user instance cache 
   useEffect(() => {
@@ -90,6 +93,34 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
       localStorage.setItem(`memory_capsules:${userEmail.trim().toLowerCase()}`, JSON.stringify(capsules));
     }
   }, [capsules, userEmail]);
+
+  useEffect(() => {
+    async function loadMusicManifest() {
+      try {
+        const response = await fetch('/music-manifest.json');
+        if (!response.ok) {
+          return;
+        }
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setMusicTracks(data);
+        }
+      } catch (error) {
+        console.error('Failed to load capsule music manifest:', error);
+      }
+    }
+
+    loadMusicManifest();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    };
+  }, []);
 
   // Handle turning a chosen journal entry into a Capsule
   const handleCreateCapsule = (e) => {
@@ -128,6 +159,7 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
       notes: sourceEntry.notes || "",
       transportation: sourceEntry.transportation || "Plane",
       photos: sourceEntry.photos || [],
+      musicId: sourceEntry.music_id || sourceEntry.musicId || null,
       isLocked: isLockedInitially,
       reminder: { type: freqType.charAt(0).toUpperCase() + freqType.slice(1), detail: detailString }
     };
@@ -158,6 +190,41 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
       reminder: { type: freqType.charAt(0).toUpperCase() + freqType.slice(1), detail: detailString }
     } : c));
     setActiveSchedulerId(null);
+  };
+
+  const playCapsuleMusic = async (capsule) => {
+    const selectedTrack = musicTracks.find((track) => track.id === capsule.musicId) || null;
+    const sourceUrl = selectedTrack?.filePath;
+
+    if (!sourceUrl) {
+      return;
+    }
+
+    if (playingCapsuleId === capsule.id) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      setPlayingCapsuleId(null);
+      return;
+    }
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+
+    const nextAudio = new Audio(sourceUrl);
+    audioRef.current = nextAudio;
+    setPlayingCapsuleId(capsule.id);
+
+    try {
+      await nextAudio.play();
+      nextAudio.onended = () => setPlayingCapsuleId(null);
+    } catch (error) {
+      console.error('Failed to play capsule soundtrack:', error);
+      setPlayingCapsuleId(null);
+    }
   };
 
   return (
@@ -266,6 +333,22 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
                   <p className="card-desc">{capsule.notes}</p>
                 ) : (
                   <p className="card-desc locked-text">This item is encrypted. Unlock capsule to inspect journal memories.</p>
+                )}
+
+                {capsule.musicId && (
+                  <div className="capsule-music-box">
+                    <button
+                      type="button"
+                      className={`capsule-music-btn ${playingCapsuleId === capsule.id ? 'playing' : ''}`}
+                      onClick={() => playCapsuleMusic(capsule)}
+                    >
+                      {playingCapsuleId === capsule.id ? 'Pause' : 'Play'}
+                    </button>
+                    <div>
+                      <small>Memory Soundtrack</small>
+                      <p>{musicTracks.find((track) => track.id === capsule.musicId)?.title || 'Selected track'}</p>
+                    </div>
+                  </div>
                 )}
 
                 <div className="reminder-info-box">
