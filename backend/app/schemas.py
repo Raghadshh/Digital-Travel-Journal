@@ -32,6 +32,7 @@ class JournalResponse(BaseModel):
     end_date: date | None = None
     notes: str | None = None
     transportation: str | None = None
+    music_id: str | None = None
     user_id: int | None = None
     photos: list[PhotoResponse] = []
 

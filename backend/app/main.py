@@ -59,6 +59,9 @@ def _ensure_sqlite_schema():
         if "longitude" not in journal_columns:
             connection.execute(text("ALTER TABLE journal_entries ADD COLUMN longitude FLOAT"))
 
+        if "music_id" not in journal_columns:
+            connection.execute(text("ALTER TABLE journal_entries ADD COLUMN music_id VARCHAR(120)"))
+
         connection.execute(text("""
             CREATE TABLE IF NOT EXISTS checklist_items (
                 id INTEGER PRIMARY KEY,
@@ -363,6 +366,7 @@ def create_journal(journal: JournalCreate, current_user: User = Depends(get_curr
         end_date=journal.end_date,
         notes=journal.notes,
         transportation=journal.transportation,
+        music_id=journal.music_id,
         user_id=current_user.id,
     )
 
@@ -415,6 +419,7 @@ def edit_journal(journal_id: int, journal: JournalCreate, current_user: User = D
     entry.end_date = journal.end_date
     entry.notes = journal.notes
     entry.transportation = journal.transportation
+    entry.music_id = journal.music_id
 
     db.commit()
     db.refresh(entry)

@@ -37,6 +37,7 @@ import CapsuleView from "./components/CapsuleView";
 import TravelStats from "./components/TravelStats";
 import WorldMap from "./components/WorldMap";
 import "./App.css";
+import MusicPicker from "./components/MusicPicker";
 
 const API_URL = "http://127.0.0.1:8000";
 const emptyEntry = {
@@ -49,7 +50,8 @@ const emptyEntry = {
   end_date: "",
   notes: "",
   transportation: "Plane",
-  photos: []
+  photos: [],
+  musicId: null
 };
 
 const locationSuggestions = [
@@ -424,6 +426,13 @@ function App() {
     }));
   }
 
+  function selectMusicTrack(trackId) {
+    setForm((current) => ({
+      ...current,
+      musicId: trackId
+    }));
+  }
+
   function openAuth(mode) {
     setShowLanding(false);
     setAuthMode(mode);
@@ -469,7 +478,8 @@ function App() {
           entry_date: form.start_date,
           end_date: form.end_date || null,
           notes: form.notes,
-          transportation: form.transportation
+          transportation: form.transportation,
+          music_id: form.musicId || null
         })
       });
 
@@ -534,6 +544,7 @@ function App() {
           longitude: geo.longitude,
           id: savedEntry.id,
           user_email: userEmail,
+          musicId: form.musicId || null,
           createdAt: new Date().toISOString()
         };
         setEntries((current) => [nextEntry, ...current]);
@@ -553,6 +564,7 @@ function App() {
       longitude: geo.longitude,
       id: crypto.randomUUID(),
       user_email: userEmail,
+      musicId: form.musicId || null,
       createdAt: new Date().toISOString()
       };
       setEntries((current) => [nextEntry, ...current]);
@@ -1022,25 +1034,7 @@ function App() {
             <div className="bottom-row">
               <PhotoGallery photos={form.photos} setPhotos={setEntryPhotos} iconSrc="/images/mini_camera_newentry.png" />
 
-              <div className="music-box">
-                <div className="music-icon-wrap">
-                  <Music className="music-note" />
-                </div>
-                <div className="music-copy">
-                  <h2>Music Memory</h2>
-                  <p>Add a song that reminds you of this trip</p>
-                  <div className="slider">
-                    <div></div>
-                  </div>
-                  <div className="music-times">
-                    <span>0:42</span>
-                    <span>2:18</span>
-                  </div>
-                </div>
-                <button type="button" className="play-btn" aria-label="Play music memory">
-                  <Play />
-                </button>
-              </div>
+              <MusicPicker selectedMusicId={form.musicId} onSelect={selectMusicTrack} />
             </div>
 
             <label className="notes-label">

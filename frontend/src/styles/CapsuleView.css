@@ -314,6 +314,50 @@
 }
 
 /* Alerts and Scheduled Info Panel Box */
+.capsule-music-box {
+  background: #f8f2ff;
+  border: 1px solid #ead8ff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.capsule-music-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 7px 12px;
+  background: #6f3bc4;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.capsule-music-btn.playing {
+  background: #c74804;
+}
+
+.capsule-music-box small {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #7c61a8;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.capsule-music-box p {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #4f357f;
+}
+
 .reminder-info-box {
   background: #f4faf7;
   border: 1px solid #d3ede2;
