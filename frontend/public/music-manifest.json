@@ -1,0 +1,27 @@
+[
+  {
+    "id": "home",
+    "title": "Home",
+    "filePath": "/music/Edward Sharpe & The Magnetic Zeros - Home (Official Video) - Rough Trade Records.mp3"
+  },
+  {
+    "id": "landslide",
+    "title": "Landslide",
+    "filePath": "/music/Fleetwood Mac - Landslide (Live) (Official Video) [HD] - Fleetwood Mac.mp3"
+  },
+  {
+    "id": "night-we-met",
+    "title": "The Night We Met",
+    "filePath": "/music/Lord Huron - The Night We Met (Official Audio) - Lord Huron.mp3"
+  },
+  {
+    "id": "to-build-a-home",
+    "title": "To Build A Home",
+    "filePath": "/music/The Cinematic Orchestra - 'To Build A Home' (Official Video) - Ninja Tune.mp3"
+  },
+  {
+    "id": "ho-hey",
+    "title": "Ho Hey",
+    "filePath": "/music/The Lumineers - Ho Hey (Official Video) - The Lumineers.mp3"
+  }
+]

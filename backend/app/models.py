@@ -37,6 +37,8 @@ class JournalEntry(Base):
 
     transportation = Column(String(50))
 
+    music_id = Column(String(120), nullable=True)
+
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
 
     user = relationship("User", back_populates="journal_entries")
