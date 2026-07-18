@@ -177,6 +177,8 @@ function App() {
   const [locationOptions, setLocationOptions] = useState([]);
   const [showLocationOptions, setShowLocationOptions] = useState(false);
   const [selectedMemory, setSelectedMemory] = useState(null);
+  const [isEditingMemory, setIsEditingMemory] = useState(false);
+  const [editingMemoryForm, setEditingMemoryForm] = useState(emptyEntry);
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
 
@@ -315,6 +317,76 @@ function App() {
       ...memoryFilters,
       [event.target.name]: event.target.value
     });
+  }
+
+  function handleEditingMemoryChange(event) {
+    setEditingMemoryForm((current) => ({
+      ...current,
+      [event.target.name]: event.target.value
+    }));
+  }
+
+  function handleEditingMemoryLocationChange(event) {
+    const nextLocation = event.target.value;
+    setEditingMemoryForm((current) => ({
+      ...current,
+      location: nextLocation
+    }));
+  }
+
+  function handleEditMemory(entry) {
+    setEditingMemoryForm({
+      ...emptyEntry,
+      title: entry.title || "",
+      location: entry.location || "",
+      country: entry.country || "",
+      latitude: entry.latitude ?? null,
+      longitude: entry.longitude ?? null,
+      start_date: entry.start_date || entry.entry_date || "",
+      end_date: entry.end_date || "",
+      notes: entry.notes || "",
+      transportation: entry.transportation || "Plane",
+      photos: entry.photos || [],
+      musicId: entry.musicId || entry.music_id || null
+    });
+    setIsEditingMemory(true);
+  }
+
+  function cancelMemoryEdit() {
+    setIsEditingMemory(false);
+    setEditingMemoryForm(emptyEntry);
+  }
+
+  function saveEditedMemory(event) {
+    event.preventDefault();
+
+    if (!selectedMemory?.id) {
+      return;
+    }
+
+    if (!editingMemoryForm.title || !editingMemoryForm.location || !editingMemoryForm.start_date) {
+      setMessage("Trip title, location, and start date are required.");
+      return;
+    }
+
+    const updatedEntry = {
+      ...selectedMemory,
+      title: editingMemoryForm.title.trim(),
+      location: editingMemoryForm.location.trim(),
+      start_date: editingMemoryForm.start_date,
+      end_date: editingMemoryForm.end_date,
+      notes: editingMemoryForm.notes,
+      transportation: editingMemoryForm.transportation,
+      photos: editingMemoryForm.photos,
+      musicId: editingMemoryForm.musicId,
+      music_id: editingMemoryForm.musicId || null
+    };
+
+    setEntries((current) => current.map((entry) => (entry.id === selectedMemory.id ? updatedEntry : entry)));
+    setSelectedMemory(updatedEntry);
+    setIsEditingMemory(false);
+    setEditingMemoryForm(emptyEntry);
+    setMessage("Trip updated.");
   }
 
   function handleProfileChange(event) {
@@ -1127,34 +1199,86 @@ function App() {
                   <button type="button" className="memory-close-btn" onClick={() => setSelectedMemory(null)} aria-label="Close memory details">
                     <CircleX />
                   </button>
-                  <div className="memory-modal-header">
-                    <div>
-                      <h2>{selectedMemory.title}</h2>
-                      <p>{selectedMemory.location}</p>
-                    </div>
-                    <span>{formatDateRange(selectedMemory)}</span>
-                  </div>
-                  <div className="memory-modal-grid">
-                    {selectedMemory.photos.map((photo) => (
-                      <img key={photo.id} src={photo.url} alt={photo.name || selectedMemory.title || "Travel memory"} />
-                    ))}
-                  </div>
-                  <dl className="memory-meta">
-                    <div>
-                      <dt>Transportation</dt>
-                      <dd>{selectedMemory.transportation || "Not added"}</dd>
-                    </div>
-                    <div>
-                      <dt>Photos</dt>
-                      <dd>{selectedMemory.photos.length}</dd>
-                    </div>
-                  </dl>
-                  {selectedMemory.notes && <p className="memory-description">{selectedMemory.notes}</p>}
-                  <div className="memory-modal-actions">
-                    <button type="button" className="delete-trip-btn" onClick={() => deleteEntry(selectedMemory)}>
-                      <Trash2 size={16} /> Delete Trip
-                    </button>
-                  </div>
+
+                  {isEditingMemory ? (
+                    <form className="memory-edit-form" onSubmit={saveEditedMemory}>
+                      <div className="memory-edit-header">
+                        <h2>Edit Trip</h2>
+                      </div>
+
+                      <div className="memory-edit-grid">
+                        <label>
+                          Trip Title
+                          <input name="title" value={editingMemoryForm.title} onChange={handleEditingMemoryChange} />
+                        </label>
+                        <label>
+                          Location
+                          <input name="location" value={editingMemoryForm.location} onChange={handleEditingMemoryLocationChange} />
+                        </label>
+                        <label>
+                          Start Date
+                          <input name="start_date" type="date" value={editingMemoryForm.start_date} onChange={handleEditingMemoryChange} />
+                        </label>
+                        <label>
+                          End Date
+                          <input name="end_date" type="date" value={editingMemoryForm.end_date} onChange={handleEditingMemoryChange} />
+                        </label>
+                        <label>
+                          Transportation
+                          <select name="transportation" value={editingMemoryForm.transportation} onChange={handleEditingMemoryChange}>
+                            <option value="Plane">Plane</option>
+                            <option value="Car">Car</option>
+                            <option value="Train">Train</option>
+                            <option value="Walking">Walking</option>
+                          </select>
+                        </label>
+                        <label className="memory-edit-notes">
+                          Notes
+                          <textarea name="notes" value={editingMemoryForm.notes} onChange={handleEditingMemoryChange} rows={4} />
+                        </label>
+                      </div>
+
+                      <div className="memory-modal-actions">
+                        <button type="submit" className="save-btn memory-save-btn">
+                          Save Changes
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <div className="memory-modal-header">
+                        <div>
+                          <h2>{selectedMemory.title}</h2>
+                          <p>{selectedMemory.location}</p>
+                        </div>
+                        <span>{formatDateRange(selectedMemory)}</span>
+                      </div>
+                      <div className="memory-modal-grid">
+                        {selectedMemory.photos.map((photo) => (
+                          <img key={photo.id} src={photo.url} alt={photo.name || selectedMemory.title || "Travel memory"} />
+                        ))}
+                      </div>
+                      <dl className="memory-meta">
+                        <div>
+                          <dt>Transportation</dt>
+                          <dd>{selectedMemory.transportation || "Not added"}</dd>
+                        </div>
+                        <div>
+                          <dt>Photos</dt>
+                          <dd>{selectedMemory.photos.length}</dd>
+                        </div>
+                      </dl>
+                      {selectedMemory.notes && <p className="memory-description">{selectedMemory.notes}</p>}
+                      <div className="memory-modal-actions">
+                        <button type="button" className="secondary-action-btn" onClick={() => handleEditMemory(selectedMemory)}>
+                          <Pencil size={16} /> Edit Trip
+                        </button>
+                        <button type="button" className="delete-trip-btn" onClick={() => deleteEntry(selectedMemory)}>
+                          <Trash2 size={16} /> Delete Trip
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}
