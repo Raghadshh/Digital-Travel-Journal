@@ -227,13 +227,6 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
     }
   };
 
-  const handleSchedulerKeyDown = (event, capsuleId) => {
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      setActiveSchedulerId(null);
-    }
-  };
-
   return (
     <div className="vault-page-container">
       <div className="vault-header">
@@ -244,13 +237,10 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
       <form className="quick-capsule-creator" onSubmit={handleCreateCapsule}>
         <h3>Wrap an Entry from Your Memories</h3>
         <div className="creator-row">
-          <label className="sr-only" htmlFor="capsule-memory-select">Choose a memory to turn into a capsule</label>
           <select 
-            id="capsule-memory-select"
             value={selectedMemoryId} 
             onChange={e => setSelectedMemoryId(e.target.value)} 
             className="memory-select"
-            aria-label="Choose a memory to turn into a capsule"
           >
             <option value="">-- Choose from My Memories --</option>
             {userMemories.map(m => (
@@ -260,33 +250,26 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
             ))}
           </select>
 
-          <label className="sr-only" htmlFor="capsule-frequency-select">Choose reminder frequency</label>
-          <select id="capsule-frequency-select" value={freqType} onChange={e => setFreqType(e.target.value)} aria-label="Choose reminder frequency">
+          <select value={freqType} onChange={e => setFreqType(e.target.value)}>
             <option value="daily">Everyday</option>
             <option value="weekly">Once a Week</option>
             <option value="monthly">Once a Month</option>
           </select>
 
           {freqType === 'weekly' && (
-            <>
-              <label className="sr-only" htmlFor="capsule-weekly-day">Choose reminder weekday</label>
-              <select id="capsule-weekly-day" value={weeklyDay} onChange={e => setWeeklyDay(e.target.value)} aria-label="Choose reminder weekday">
-                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
-            </>
+            <select value={weeklyDay} onChange={e => setWeeklyDay(e.target.value)}>
+              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
           )}
 
           {freqType === 'monthly' && (
-            <>
-              <label className="sr-only" htmlFor="capsule-monthly-day">Choose reminder day of month</label>
-              <select id="capsule-monthly-day" value={monthlyDay} onChange={e => setMonthlyDay(parseInt(e.target.value))} aria-label="Choose reminder day of month">
-                {Array.from({ length: 30 }, (_, i) => i + 1).map(num => (
-                  <option key={num} value={num}>Day {num}</option>
-                ))}
-              </select>
-            </>
+            <select value={monthlyDay} onChange={e => setMonthlyDay(parseInt(e.target.value))}>
+              {Array.from({ length: 30 }, (_, i) => i + 1).map(num => (
+                <option key={num} value={num}>Day {num}</option>
+              ))}
+            </select>
           )}
 
           <label className="checkbox-label">
@@ -294,12 +277,11 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
               type="checkbox" 
               checked={isLockedInitially} 
               onChange={e => setIsLockedInitially(e.target.checked)} 
-              aria-label="Lock capsule immediately"
             />
             Lock Initially
           </label>
 
-          <button type="submit" className="create-capsule-btn" aria-label="Create capsule from selected memory"> Create Capsule</button>
+          <button type="submit" className="create-capsule-btn"> Create Capsule</button>
         </div>
       </form>
 
@@ -319,7 +301,7 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
                 className="delete-corner-btn"
                 onClick={() => deleteCapsule(capsule.id)}
                 title="Delete Capsule"
-                aria-label={`Delete capsule ${capsule.title}`}
+                aria-label="Delete capsule"
               >
                 ×
               </button>
@@ -381,7 +363,6 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
                   <button 
                     className={`lock-btn ${capsule.isLocked ? 'unlock-style' : 'lock-style'}`}
                     onClick={() => toggleLock(capsule.id)}
-                    aria-label={capsule.isLocked ? `Unlock capsule ${capsule.title}` : `Lock capsule ${capsule.title}`}
                   >
                     {capsule.isLocked ? 'Unlock Memory' : 'Lock Capsule'}
                   </button>
@@ -389,7 +370,6 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
                   <button 
                     className="schedule-trigger-btn" 
                     onClick={() => { setActiveSchedulerId(capsule.id); setFreqType('daily'); }}
-                    aria-label={`Open reminder settings for ${capsule.title}`}
                   >
                     Schedule
                   </button>
@@ -398,11 +378,11 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
 
               {/* Inline Schedule Configuration overlay panel */}
               {activeSchedulerId === capsule.id && (
-                <div className="scheduler-inline-modal" role="dialog" aria-modal="true" aria-labelledby={`scheduler-title-${capsule.id}`} onKeyDown={(event) => handleSchedulerKeyDown(event, capsule.id)}>
-                  <h3 id={`scheduler-title-${capsule.id}`}>Adjust Reminders</h3>
+                <div className="scheduler-inline-modal">
+                  <h3>Adjust Reminders</h3>
                   <div className="input-row">
-                    <label htmlFor={`capsule-frequency-${capsule.id}`}>Frequency Type:</label>
-                    <select id={`capsule-frequency-${capsule.id}`} value={freqType} onChange={(e) => setFreqType(e.target.value)}>
+                    <label>Frequency Type:</label>
+                    <select value={freqType} onChange={(e) => setFreqType(e.target.value)}>
                       <option value="daily">Everyday</option>
                       <option value="weekly">Once a Week</option>
                       <option value="monthly">Once a Month</option>
@@ -411,8 +391,8 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
 
                   {freqType === 'weekly' && (
                     <div className="input-row">
-                      <label htmlFor={`capsule-weekday-${capsule.id}`}>Target Weekday:</label>
-                      <select id={`capsule-weekday-${capsule.id}`} value={weeklyDay} onChange={(e) => setWeeklyDay(e.target.value)}>
+                      <label>Target Weekday:</label>
+                      <select value={weeklyDay} onChange={(e) => setWeeklyDay(e.target.value)}>
                         {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
                           <option key={d} value={d}>{d}</option>
                         ))}
@@ -422,8 +402,8 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
 
                   {freqType === 'monthly' && (
                     <div className="input-row">
-                      <label htmlFor={`capsule-monthday-${capsule.id}`}>Day of the Month (1-30):</label>
-                      <select id={`capsule-monthday-${capsule.id}`} value={monthlyDay} onChange={(e) => setMonthlyDay(parseInt(e.target.value))}>
+                      <label>Day of the Month (1-30):</label>
+                      <select value={monthlyDay} onChange={(e) => setMonthlyDay(parseInt(e.target.value))}>
                         {Array.from({ length: 30 }, (_, i) => i + 1).map(dayNum => (
                           <option key={dayNum} value={dayNum}>Day {dayNum}</option>
                         ))}
@@ -432,8 +412,8 @@ export default function CapsuleView({ entries = [], userEmail = "" }) {
                   )}
 
                   <div className="scheduler-actions">
-                    <button className="confirm-btn" onClick={() => saveReminderSettings(capsule.id)} aria-label={`Apply reminder settings for ${capsule.title}`}>Apply Settings</button>
-                    <button className="cancel-btn" onClick={() => setActiveSchedulerId(null)} aria-label={`Close reminder settings for ${capsule.title}`}>Close</button>
+                    <button className="confirm-btn" onClick={() => saveReminderSettings(capsule.id)}>Apply Settings</button>
+                    <button className="cancel-btn" onClick={() => setActiveSchedulerId(null)}>Close</button>
                   </div>
                 </div>
               )}
