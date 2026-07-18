@@ -95,6 +95,13 @@ function MusicPicker({ selectedMusicId, onSelect }) {
     setPickerOpen((current) => !current);
   }
 
+  function handlePickerKeyDown(event) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setPickerOpen(false);
+    }
+  }
+
   return (
     <div className="music-box" role="group" aria-label="Music memory picker">
       <div className="music-icon-wrap">
@@ -115,9 +122,12 @@ function MusicPicker({ selectedMusicId, onSelect }) {
         <button
           type="button"
           className={`play-btn ${selectedMusicId ? "active" : ""}`}
-          aria-label={selectedTrack ? `Selected ${selectedTrack.title}` : "Choose music memory"}
+          aria-label={selectedTrack ? `Choose music, currently ${selectedTrack.title}` : "Choose music memory"}
           aria-expanded={pickerOpen}
+          aria-haspopup="listbox"
+          aria-controls="music-picker-list"
           onClick={togglePicker}
+          onKeyDown={handlePickerKeyDown}
         >
           <Play />
         </button>
@@ -125,13 +135,16 @@ function MusicPicker({ selectedMusicId, onSelect }) {
           {selectedTrack ? getDisplayTitle(selectedTrack) : ""}
         </div>
         {pickerOpen && (
-          <div className="music-dropdown">
+          <div id="music-picker-list" className="music-dropdown" role="listbox" onKeyDown={handlePickerKeyDown}>
             {tracks.map((track) => (
               <button
                 key={track.id}
                 type="button"
                 className={`music-dropdown-item ${selectedMusicId === track.id ? "active" : ""}`}
                 onClick={() => handleSelect(track)}
+                role="option"
+                aria-selected={selectedMusicId === track.id}
+                aria-label={`Select ${getDisplayTitle(track)}`}
               >
                 <span>{getDisplayTitle(track)}</span>
               </button>
