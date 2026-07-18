@@ -38,49 +38,9 @@ def _ensure_sqlite_schema():
         return
 
     with engine.begin() as connection:
-        user_columns = {row[1] for row in connection.execute(text("PRAGMA table_info(users)"))}
-        journal_columns = {row[1] for row in connection.execute(text("PRAGMA table_info(journal_entries)"))}
-
-        if "full_name" not in user_columns:
-            connection.execute(text("ALTER TABLE users ADD COLUMN full_name VARCHAR(120)"))
-
-        if "user_id" not in journal_columns:
-            connection.execute(text("ALTER TABLE journal_entries ADD COLUMN user_id INTEGER"))
-
-        if "end_date" not in journal_columns:
-            connection.execute(text("ALTER TABLE journal_entries ADD COLUMN end_date DATE"))
-        
-        if "country" not in journal_columns:
-            connection.execute(text("ALTER TABLE journal_entries ADD COLUMN country VARCHAR(100)"))
-
-        if "latitude" not in journal_columns:
-            connection.execute(text("ALTER TABLE journal_entries ADD COLUMN latitude FLOAT"))
-
-        if "longitude" not in journal_columns:
-            connection.execute(text("ALTER TABLE journal_entries ADD COLUMN longitude FLOAT"))
-
-        if "music_id" not in journal_columns:
-            connection.execute(text("ALTER TABLE journal_entries ADD COLUMN music_id VARCHAR(120)"))
-
-        connection.execute(text("""
-            CREATE TABLE IF NOT EXISTS checklist_items (
-                id INTEGER PRIMARY KEY,
-                text VARCHAR(180) NOT NULL,
-                completed BOOLEAN NOT NULL DEFAULT 0,
-                user_id INTEGER NOT NULL
-            )
-        """))
+        connection.execute(text("CREATE TABLE IF NOT EXISTS checklist_items (id INTEGER PRIMARY KEY, text VARCHAR(180) NOT NULL, completed BOOLEAN NOT NULL DEFAULT 0, user_id INTEGER NOT NULL)"))
+        connection.execute(text("CREATE TABLE IF NOT EXISTS itinerary_items (id INTEGER PRIMARY KEY, date DATE NOT NULL, time VARCHAR(20), activity VARCHAR(180) NOT NULL, location VARCHAR(180), user_id INTEGER NOT NULL)"))
         connection.execute(text("CREATE INDEX IF NOT EXISTS ix_checklist_items_user_id ON checklist_items (user_id)"))
-        connection.execute(text("""
-            CREATE TABLE IF NOT EXISTS itinerary_items (
-                id INTEGER PRIMARY KEY,
-                date DATE NOT NULL,
-                time VARCHAR(20),
-                activity VARCHAR(180) NOT NULL,
-                location VARCHAR(180),
-                user_id INTEGER NOT NULL
-            )
-        """))
         connection.execute(text("CREATE INDEX IF NOT EXISTS ix_itinerary_items_user_id ON itinerary_items (user_id)"))
 
 
@@ -366,7 +326,7 @@ def create_journal(journal: JournalCreate, current_user: User = Depends(get_curr
         end_date=journal.end_date,
         notes=journal.notes,
         transportation=journal.transportation,
-        music_id=journal.music_id,
+        music_id=getattr(journal, "music_id", None),
         user_id=current_user.id,
     )
 

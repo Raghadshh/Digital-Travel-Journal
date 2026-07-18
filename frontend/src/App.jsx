@@ -1006,7 +1006,7 @@ function App() {
           </section>
         ) : currentView === "stats" ? (
           <section className="entry-card feature-page">
-            <TravelStats token={token} apiUrl={API_URL} />
+            <TravelStats token={token} apiUrl={API_URL} refreshKey={entries.length} />
           </section>
         
         ) : currentView === "create" ? (
