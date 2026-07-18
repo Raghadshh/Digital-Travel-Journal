@@ -2,13 +2,16 @@ import { useEffect, useState } from "react";
 import { Camera, MapPin, Globe, Plane, Loader2, Car, CalendarDays, Hourglass } from "lucide-react";
 import "../styles/TimelineView.css";
 
-export default function TravelStats({ token, apiUrl }) {
+export default function TravelStats({ token, apiUrl, refreshKey }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     async function fetchStats() {
+      if (!token) return;
+
+      setLoading(true);
       try {
         const response = await fetch(`${apiUrl}/journals/stats`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -16,14 +19,16 @@ export default function TravelStats({ token, apiUrl }) {
         if (!response.ok) throw new Error("Failed to load your travel metrics.");
         const data = await response.json();
         setStats(data);
+        setError("");
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     }
-    if (token) fetchStats();
-  }, [token, apiUrl]);
+
+    fetchStats();
+  }, [token, apiUrl, refreshKey]);
 
   if (loading) {
     return (
