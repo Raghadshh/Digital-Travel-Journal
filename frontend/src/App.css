@@ -2103,14 +2103,12 @@ select {
 
 .memory-close-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 16px;
+  right: 16px;
   border: none;
   background: transparent;
   color: #073c3b;
   cursor: pointer;
-  padding: 4px;
-  z-index: 2;
 }
 
 .memory-close-btn svg {
@@ -2122,7 +2120,7 @@ select {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  padding-right: 48px;
+  padding-right: 36px;
   margin-bottom: 18px;
 }
 
@@ -2190,24 +2188,7 @@ select {
 .memory-modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
   margin-top: 20px;
-  padding-right: 8px;
-}
-
-.secondary-action-btn {
-  min-height: 40px;
-  border: 1px solid #ebdccb;
-  border-radius: 10px;
-  background: #fffaf3;
-  color: #073c3b;
-  padding: 0 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: inherit;
-  font-weight: 900;
-  cursor: pointer;
 }
 
 .delete-trip-btn {

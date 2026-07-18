@@ -59,14 +59,9 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.quick-capsule-creator select:focus,
-.quick-capsule-creator button:focus-visible,
-.capsule-card button:focus-visible,
-.capsule-card select:focus-visible,
-.capsule-card input:focus-visible {
+.quick-capsule-creator select:focus {
   border-color: #134e3a;
-  box-shadow: 0 0 0 3px rgba(19, 78, 58, 0.16);
-  outline: none;
+  box-shadow: 0 0 0 3px rgba(19, 78, 58, 0.1);
 }
 
 .quick-capsule-creator .memory-select {

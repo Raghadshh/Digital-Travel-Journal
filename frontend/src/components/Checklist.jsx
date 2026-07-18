@@ -126,31 +126,15 @@ export default function Checklist({ storageKey = "travel_journal_checklist", tok
     setEditValue("");
   }
 
-  function handleEditKeyDown(event, id) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      handleSaveEdit(id);
-      return;
-    }
-
-    if (event.key === "Escape") {
-      event.preventDefault();
-      setEditingId(null);
-      setEditValue("");
-    }
-  }
-
   return (
     <div className="checklist-panel">
       <div className="feature-panel-header">
         <h2>Trip Checklist</h2>
-        <span aria-live="polite">{items.filter((item) => item.completed).length}/{items.length}</span>
+        <span>{items.filter((item) => item.completed).length}/{items.length}</span>
       </div>
 
       <form className="checklist-form" onSubmit={handleAddItem}>
-        <label className="sr-only" htmlFor="checklist-new-item">Add a checklist item</label>
         <input
-          id="checklist-new-item"
           type="text"
           value={inputValue}
           onChange={(event) => setInputValue(event.target.value)}
@@ -171,35 +155,30 @@ export default function Checklist({ storageKey = "travel_journal_checklist", tok
                 type="button"
                 className={`check-toggle ${item.completed ? "checked" : ""}`}
                 onClick={() => handleToggleComplete(item.id)}
-                aria-label={item.completed ? `Mark ${item.text} as incomplete` : `Mark ${item.text} as complete`}
+                aria-label="Toggle checklist item"
               >
                 {item.completed && <Check size={15} />}
               </button>
 
               {editingId === item.id ? (
-                <>
-                  <label className="sr-only" htmlFor={`edit-checklist-item-${item.id}`}>Edit checklist item</label>
-                  <input
-                    id={`edit-checklist-item-${item.id}`}
-                    className="inline-edit-input"
-                    value={editValue}
-                    onChange={(event) => setEditValue(event.target.value)}
-                    onKeyDown={(event) => handleEditKeyDown(event, item.id)}
-                  />
-                </>
+                <input
+                  className="inline-edit-input"
+                  value={editValue}
+                  onChange={(event) => setEditValue(event.target.value)}
+                />
               ) : (
                 <span className={item.completed ? "completed-text" : ""}>{item.text}</span>
               )}
 
               <div className="table-actions">
                 {editingId === item.id ? (
-                  <button type="button" className="save-action" onClick={() => handleSaveEdit(item.id)} aria-label={`Save edited checklist item ${item.text}`}>Save</button>
+                  <button type="button" className="save-action" onClick={() => handleSaveEdit(item.id)}>Save</button>
                 ) : (
-                  <button type="button" onClick={() => startEdit(item)} disabled={item.completed} aria-label={`Edit checklist item ${item.text}`}>
+                  <button type="button" onClick={() => startEdit(item)} disabled={item.completed} aria-label="Edit checklist item">
                     <Pencil size={14} />
                   </button>
                 )}
-                <button type="button" className="danger-action" onClick={() => handleDeleteItem(item.id)} aria-label={`Delete checklist item ${item.text}`}>
+                <button type="button" className="danger-action" onClick={() => handleDeleteItem(item.id)} aria-label="Delete checklist item">
                   <Trash2 size={14} />
                 </button>
               </div>

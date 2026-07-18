@@ -4,13 +4,6 @@ import { X } from "lucide-react";
 export default function PhotoGallery({ photos, setPhotos, Icon, iconSrc }) {
   const [error, setError] = useState("");
 
-  function handleLabelKeyDown(event) {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      document.getElementById("photo-upload")?.click();
-    }
-  }
-
   function handlePhotoUpload(event) {
     const files = Array.from(event.target.files);
     setError("");
@@ -45,28 +38,20 @@ export default function PhotoGallery({ photos, setPhotos, Icon, iconSrc }) {
 
   return (
     <div className="upload-zone">
-      <label
-        htmlFor="photo-upload"
-        className="photo-box"
-        tabIndex={0}
-        role="button"
-        aria-label="Upload travel photos"
-        aria-describedby={error ? "photo-upload-error" : undefined}
-        onKeyDown={handleLabelKeyDown}
-      >
-        {iconSrc && <img src={iconSrc} alt="" aria-hidden="true" className="photo-upload-icon" />}
+      <label htmlFor="photo-upload" className="photo-box">
+        {iconSrc && <img src={iconSrc} alt="" className="photo-upload-icon" />}
         {Icon && <Icon />}
         <h3>Add Photos</h3>
         <p>Upload your photos</p>
       </label>
-      <input id="photo-upload" type="file" multiple accept="image/*" onChange={handlePhotoUpload} hidden aria-label="Upload travel photos" />
-      {error && <p id="photo-upload-error" className="error-message" role="alert">{error}</p>}
+      <input id="photo-upload" type="file" multiple accept="image/*" onChange={handlePhotoUpload} hidden />
+      {error && <p className="error-message">{error}</p>}
 
       {photos.length > 0 && (
         <div className="selected-photos">
           {photos.map((photo) => (
             <div key={photo.id} className="selected-photo">
-              <img src={photo.url} alt={photo.name ? `${photo.name} preview` : "Selected travel memory preview"} />
+              <img src={photo.url} alt={photo.name || "Selected travel memory"} />
               <button type="button" onClick={() => removePhoto(photo.id)} aria-label="Remove photo">
                 <X size={14} />
               </button>
