@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -20,6 +21,7 @@ class JournalCreate(BaseModel):
     end_date: date | None = None
     notes: str | None = None
     transportation: str | None = None
+    music_id: Optional[str] = None
 
 class JournalResponse(BaseModel):
     id: int
