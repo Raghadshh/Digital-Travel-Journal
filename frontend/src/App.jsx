@@ -5,6 +5,7 @@ import {
   Camera,
   Car,
   ChevronLeft,
+  CircleHelp,
   CircleX,
   Eye,
   EyeOff,
@@ -75,6 +76,10 @@ function profileNameKey(email) {
   return `travel_journal_name:${email.trim().toLowerCase()}`;
 }
 
+function profilePictureKey(email) {
+  return `travel_journal_pfp:${email.trim().toLowerCase()}`;
+}
+
 function getStoredProfileName(email) {
   return email ? window.localStorage.getItem(profileNameKey(email)) : "";
 }
@@ -82,6 +87,22 @@ function getStoredProfileName(email) {
 function rememberProfileName(email, name) {
   if (email && name) {
     window.localStorage.setItem(profileNameKey(email), name);
+  }
+}
+
+function getStoredProfilePicture(email) {
+  return email ? window.localStorage.getItem(profilePictureKey(email)) : "";
+}
+
+function rememberProfilePicture(email, picture) {
+  if (!email) {
+    return;
+  }
+
+  if (picture) {
+    window.localStorage.setItem(profilePictureKey(email), picture);
+  } else {
+    window.localStorage.removeItem(profilePictureKey(email));
   }
 }
 
@@ -163,7 +184,7 @@ function App() {
     const email = window.localStorage.getItem("travel_journal_user") || "";
     return getStoredProfileName(email) || window.localStorage.getItem("travel_journal_name") || "";
   });
-  const [profilePicture, setProfilePicture] = useState(() => window.localStorage.getItem("travel_journal_pfp") || "");
+  const [profilePicture, setProfilePicture] = useState(() => getStoredProfilePicture(window.localStorage.getItem("travel_journal_user") || ""));
   const [profileForm, setProfileForm] = useState({
     name: window.localStorage.getItem("travel_journal_name") || ""
   });
@@ -177,6 +198,9 @@ function App() {
   const [locationOptions, setLocationOptions] = useState([]);
   const [showLocationOptions, setShowLocationOptions] = useState(false);
   const [selectedMemory, setSelectedMemory] = useState(null);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialDismissed, setTutorialDismissed] = useState(() => window.localStorage.getItem("travel_journal_tutorial_dismissed") === "true");
+  const [editingEntryId, setEditingEntryId] = useState(null);
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
 
@@ -202,10 +226,20 @@ function App() {
   }, [userEmail, userName]);
 
   useEffect(() => {
-    profilePicture
-      ? window.localStorage.setItem("travel_journal_pfp", profilePicture)
-      : window.localStorage.removeItem("travel_journal_pfp");
-  }, [profilePicture]);
+    if (userEmail) {
+      rememberProfilePicture(userEmail, profilePicture);
+    }
+  }, [profilePicture, userEmail]);
+
+  useEffect(() => {
+    if (token && userEmail && !tutorialDismissed) {
+      setShowTutorial(true);
+    }
+  }, [token, userEmail, tutorialDismissed]);
+
+  useEffect(() => {
+    window.localStorage.setItem("travel_journal_tutorial_dismissed", tutorialDismissed ? "true" : "false");
+  }, [tutorialDismissed]);
 
   useEffect(() => {
     if (userEmail) {
@@ -447,6 +481,45 @@ function App() {
     ref.current?.focus();
   }
 
+  function openTutorial() {
+    setShowTutorial(true);
+  }
+
+  function dismissTutorial() {
+    setShowTutorial(false);
+    setTutorialDismissed(true);
+  }
+
+  function startEditingEntry(entry) {
+    if (!entry) {
+      return;
+    }
+
+    setForm({
+      title: entry.title || "",
+      location: entry.location || "",
+      country: entry.country || "",
+      latitude: entry.latitude ?? null,
+      longitude: entry.longitude ?? null,
+      start_date: entry.start_date || entry.entry_date || "",
+      end_date: entry.end_date || "",
+      notes: entry.notes || "",
+      transportation: entry.transportation || "Plane",
+      photos: Array.isArray(entry.photos) ? entry.photos : [],
+      musicId: entry.music_id || entry.musicId || null
+    });
+    setEditingEntryId(entry.id);
+    setSelectedMemory(null);
+    setCurrentView("create");
+    setMessage("Editing existing trip...");
+  }
+
+  function cancelEditEntry() {
+    setEditingEntryId(null);
+    setForm({ ...emptyEntry, photos: [] });
+    setMessage("");
+  }
+
   function formatDateRange(entry) {
     const start = entry.start_date || entry.entry_date || "";
     const end = entry.end_date || "";
@@ -461,10 +534,11 @@ function App() {
 
     setMessage("Finding location on map...");
     const geo = await geocodeLocation(form.location);
+    const isEditing = Boolean(editingEntryId);
 
     try {
-      const response = await fetch(`${API_URL}/journals`, {
-        method: "POST",
+      const response = await fetch(`${API_URL}${isEditing ? `/journals/${editingEntryId}` : "/journals"}`, {
+        method: isEditing ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -484,28 +558,28 @@ function App() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create textual entry profile.");
+        throw new Error(isEditing ? "Failed to update journal entry." : "Failed to create textual entry profile.");
       }
 
       const savedEntry = await response.json();
 
-      if (form.photos && form.photos.length > 0) {
+      if (!isEditing && form.photos && form.photos.length > 0) {
         const formData = new FormData();
-        
+
         form.photos.forEach((photo, index) => {
           const dataUrl = typeof photo === "string" ? photo : photo.url;
-          
+
           if (dataUrl && dataUrl.startsWith("data:")) {
             const arr = dataUrl.split(',');
             const mime = arr[0].match(/:(.*?);/)[1];
             const bstr = atob(arr[1]);
             let n = bstr.length;
             const u8arr = new Uint8Array(n);
-            
+
             while (n--) {
               u8arr[n] = bstr.charCodeAt(n);
             }
-            
+
             const extension = mime.split('/')[1] || 'jpg';
             const file = new File([u8arr], `photo_${index}.${extension}`, { type: mime });
             formData.append("files", file);
@@ -536,6 +610,27 @@ function App() {
       if (refreshResponse.ok) {
         const structuralData = await refreshResponse.json();
         setEntries(structuralData);
+      } else if (isEditing) {
+        setEntries((current) =>
+          current.map((currentEntry) =>
+            currentEntry.id === editingEntryId
+              ? {
+                  ...currentEntry,
+                  title: form.title,
+                  location: form.location,
+                  country: geo.country,
+                  latitude: geo.latitude,
+                  longitude: geo.longitude,
+                  start_date: form.start_date,
+                  end_date: form.end_date || null,
+                  notes: form.notes,
+                  transportation: form.transportation,
+                  musicId: form.musicId || null,
+                  user_email: userEmail
+                }
+              : currentEntry
+          )
+        );
       } else {
         const nextEntry = {
           ...form,
@@ -550,26 +645,34 @@ function App() {
         setEntries((current) => [nextEntry, ...current]);
       }
 
-      setMessage("Journal entry saved successfully.");
-      setForm(emptyEntry);
+      setMessage(isEditing ? "Journal entry updated successfully." : "Journal entry saved successfully.");
+      setForm({ ...emptyEntry, photos: [] });
+      setEditingEntryId(null);
       setCurrentView("memories");
 
     } catch (error) {
       console.error("Backend offline fallback redirection triggered:", error);
-      
+
       const nextEntry = {
-      ...form,
-      country: geo.country,
-      latitude: geo.latitude,
-      longitude: geo.longitude,
-      id: crypto.randomUUID(),
-      user_email: userEmail,
-      musicId: form.musicId || null,
-      createdAt: new Date().toISOString()
+        ...form,
+        country: geo.country,
+        latitude: geo.latitude,
+        longitude: geo.longitude,
+        id: editingEntryId || crypto.randomUUID(),
+        user_email: userEmail,
+        musicId: form.musicId || null,
+        createdAt: new Date().toISOString()
       };
-      setEntries((current) => [nextEntry, ...current]);
-      setMessage("Saved locally. Start the backend to sync entries.");
-      setForm(emptyEntry);
+
+      if (editingEntryId) {
+        setEntries((current) => current.map((currentEntry) => (currentEntry.id === editingEntryId ? nextEntry : currentEntry)));
+      } else {
+        setEntries((current) => [nextEntry, ...current]);
+      }
+
+      setMessage(isEditing ? "Saved locally. Start the backend to sync your edit." : "Saved locally. Start the backend to sync entries.");
+      setForm({ ...emptyEntry, photos: [] });
+      setEditingEntryId(null);
       setCurrentView("memories");
     }
   }
@@ -629,6 +732,7 @@ function App() {
       setToken(data.access_token);
       setUserEmail(normalizedEmail);
       setUserName(savedName || fallbackName);
+      setProfilePicture(getStoredProfilePicture(normalizedEmail));
       setEntries(getStoredEntries(normalizedEmail));
       setAuthMessage(data.message || "Authentication successful");
       setAuthForm({ full_name: "", email: "", password: "" });
@@ -667,6 +771,7 @@ function App() {
           setToken(data.access_token);
           setUserEmail(data.email);
           setUserName(savedName || data.name || data.email.split("@")[0]);
+          setProfilePicture(getStoredProfilePicture(data.email));
           setEntries(getStoredEntries(data.email));
           setCurrentView("memories");
         } catch (error) {
@@ -681,9 +786,13 @@ function App() {
     setToken(null);
     setUserEmail("");
     setUserName("");
+    setProfilePicture("");
     setEntries([]);
+    setEditingEntryId(null);
+    setForm({ ...emptyEntry, photos: [] });
     setCurrentView("memories");
     setShowLanding(true);
+    setShowTutorial(false);
     setAuthMessage("You have been logged out.");
   }
 
@@ -877,6 +986,37 @@ function App() {
       </aside>
 
       <main className="entry-area">
+        <div className="entry-area-top">
+          <button type="button" className="tutorial-btn" onClick={openTutorial}>
+            <CircleHelp size={16} /> Quick Tour
+          </button>
+        </div>
+
+        {showTutorial && (
+          <div className="tutorial-modal-backdrop" role="dialog" aria-modal="true" aria-label="Travel journal tutorial">
+            <div className="tutorial-modal">
+              <div className="tutorial-modal-header">
+                <h3>Quick Start Guide</h3>
+                <button type="button" className="tutorial-close-btn" onClick={dismissTutorial} aria-label="Close tutorial">
+                  ×
+                </button>
+              </div>
+              <ul className="tutorial-list">
+                <li>Use New Entry to save a new trip with photos, notes, and music.</li>
+                <li>Open My Memories to browse your past trips and tap the edit button when you want to update one.</li>
+                <li>Visit the Capsule page to turn memories into a fun reminder experience.</li>
+                <li>Use Map to view all your adventure locations pinned across the world.</li>
+                <li>Open Timeline to relive your trips in chronological order.</li>
+                <li>Visit Itinerary to organize daily schedules and plan your upcoming trips.</li>
+                <li>Check My Stats to see your travel totals.</li>
+              </ul>
+              <button type="button" className="save-btn tutorial-continue-btn" onClick={dismissTutorial}>
+                Got it
+              </button>
+            </div>
+          </div>
+        )}
+
         {currentView === "map" ? (
           <section className="entry-card feature-page">
             <WorldMap entries={entries} onNewEntry={() => setCurrentView("create")} />
@@ -939,9 +1079,16 @@ function App() {
         
         ) : currentView === "create" ? (
           <section className="entry-card">
-            <h1>
-              Create a New Journal Entry <Heart className="title-heart" size={22} fill="currentColor" />
-            </h1>
+            <div className="create-header-row">
+              <h1>
+                {editingEntryId ? "Edit Journal Entry" : "Create a New Journal Entry"} <Heart className="title-heart" size={22} fill="currentColor" />
+              </h1>
+              {editingEntryId && (
+                <button type="button" className="cancel-edit-btn" onClick={cancelEditEntry}>
+                  Cancel Edit
+                </button>
+              )}
+            </div>
 
             <div className="form-grid">
               <label>
@@ -1054,9 +1201,11 @@ function App() {
               <h1>
                 My Memories <Heart className="title-heart" size={22} fill="currentColor" />
               </h1>
-              <button type="button" className="new-entry-btn" onClick={() => setCurrentView("create")}>
-                + New Entry
-              </button>
+              <div className="page-heading-actions">
+                <button type="button" className="new-entry-btn" onClick={() => setCurrentView("create")}>
+                  + New Entry
+                </button>
+              </div>
             </div>
 
             <div className="memory-toolbar">
@@ -1151,6 +1300,9 @@ function App() {
                   </dl>
                   {selectedMemory.notes && <p className="memory-description">{selectedMemory.notes}</p>}
                   <div className="memory-modal-actions">
+                    <button type="button" className="edit-trip-btn" onClick={() => startEditingEntry(selectedMemory)}>
+                      <Pencil size={16} /> Edit Trip
+                    </button>
                     <button type="button" className="delete-trip-btn" onClick={() => deleteEntry(selectedMemory)}>
                       <Trash2 size={16} /> Delete Trip
                     </button>
